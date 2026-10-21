@@ -122,7 +122,7 @@ const translations = {
     commitGenerating: '✨ KI schreibt die Commit-Nachricht…',
     commitPlaceholder: (n: number) => `Commit-Nachricht für ${n} Datei(en)…`,
     commitNoFiles: 'Versionierte Dateien auswählen, um zu committen…',
-    generateMessage: 'Commit-Nachricht mit KI generieren (/svn-message)',
+    generateMessage: 'Commit-Nachricht mit KI generieren',
     aiComingSoon: 'KI-Funktionen sind noch nicht verfügbar.',
     commitButton: (n: number) => `Commit${n > 0 ? ` (${n})` : ''}`,
     commitTooManyFiles: (n: number) =>
@@ -685,10 +685,8 @@ const translations = {
     // SVN availability messages
     svnNotReady:
       'SVN ist noch nicht bereit. Öffne das SVN-Panel einmal in diesem Fenster, um es zu initialisieren.',
-    extensionUnavailable:
-      'Erweiterungskontext ist nicht verfügbar; Erweiterung neu laden.',
-    aiUnavailable:
-      'KI-Dienst ist nicht verfügbar; Berechtigung „ai“ aktivieren und Erweiterung neu laden.',
+    extensionUnavailable: 'Host-Kontext ist nicht verfügbar.',
+    aiUnavailable: 'KI-Dienst ist nicht verfügbar.',
     svnNotFoundReason:
       'Der Befehl „svn“ wurde nicht gefunden. Installiere einen Subversion-Client und stelle sicher, dass er im PATH liegt.',
     cwdMissing: (cwd: string) => `Arbeitsverzeichnis existiert nicht: ${cwd}`,
@@ -838,7 +836,7 @@ const translations = {
     commitGenerating: '✨ AI is writing the commit message…',
     commitPlaceholder: (n: number) => `Commit message for ${n} file(s)…`,
     commitNoFiles: 'Select versioned files to commit…',
-    generateMessage: 'Generate commit message with AI (/svn-message)',
+    generateMessage: 'Generate commit message with AI',
     aiComingSoon: 'AI features are not available yet.',
     commitButton: (n: number) => `Commit${n > 0 ? ` (${n})` : ''}`,
     commitTooManyFiles: (n: number) =>
@@ -1389,10 +1387,8 @@ const translations = {
     // SVN availability messages
     svnNotReady:
       'SVN is not ready yet. Open the SVN panel once in this window to initialize it.',
-    extensionUnavailable:
-      'Extension context is not available; reload the extension.',
-    aiUnavailable:
-      'AI service is not available; enable the "ai" permission and reload the extension.',
+    extensionUnavailable: 'Host context is not available.',
+    aiUnavailable: 'AI service is not available.',
     svnNotFoundReason:
       'The "svn" command was not found. Install a Subversion client and make sure it is on your PATH.',
     cwdMissing: (cwd: string) => `Working directory does not exist: ${cwd}`,

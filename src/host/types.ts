@@ -27,7 +27,7 @@ export interface AiProvider {
   listModels(): Promise<{ id: string; name: string; provider: string }[]>;
 }
 
-/** The host APIs the SVN panel uses. Both the extension adapter and the Electron adapter implement this. */
+/** The host APIs the SVN panel uses. The Electron adapter implements this. */
 export interface HostAdapter {
   /** Absolute path of the current workspace / working directory. */
   workspacePath: string;

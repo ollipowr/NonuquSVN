@@ -306,7 +306,6 @@ ipcMain.handle('open-file', async (_e, filePath: string) => {
   const error = await shell.openPath(filePath);
   if (!error) return;
   // Some Windows installations have no association for source-code extensions.
-  // Some Windows installs have no default app for source-code extensions.
   if (process.platform === 'win32' && stat.isFile()) {
     const child = spawn('notepad.exe', [filePath], {
       detached: true,
