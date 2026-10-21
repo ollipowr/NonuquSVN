@@ -1,0 +1,53 @@
+.svn-commit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--nonu-border);
+  background: var(--nonu-bg-secondary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.svn-magic-spin {
+  display: inline-block;
+  animation: svn-magic-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes svn-magic-pulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35) rotate(20deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes svn-magic-glow {
+  0%,
+  100% {
+    border-color: var(--nonu-border);
+  }
+  50% {
+    border-color: var(--nonu-primary);
+  }
+}
+.svn-commit .svn-input {
+  flex: 1;
+  resize: none;
+  padding: 6px 8px;
+}
+
+.svn-commit-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.svn-commit .svn-commit-generating {
+  opacity: 0.6;
+  animation: svn-magic-glow 1.2s ease-in-out infinite;
+}

@@ -1,0 +1,45 @@
+.svn-auth-dialog {
+  background: var(--nonu-bg);
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  padding: 14px;
+  width: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 24px color-mix(in srgb, black 35%, transparent);
+}
+
+.svn-auth-title {
+  font-weight: 600;
+  font-size: var(--nonu-text-md);
+}
+
+.svn-auth-hint {
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+  line-height: 1.5;
+}
+
+.svn-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+}
+
+.svn-auth-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}

@@ -1,0 +1,54 @@
+.svn-confirm-dialog {
+  background: var(--nonu-bg);
+  border: 1px solid var(--nonu-border);
+  border-radius: 8px;
+  padding: 18px 18px 14px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 32px color-mix(in srgb, black 40%, transparent);
+}
+
+.svn-confirm-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.svn-confirm-icon {
+  font-size: var(--nonu-icon-lg);
+  color: var(--nonu-primary);
+  flex-shrink: 0;
+}
+
+.svn-confirm-icon--danger {
+  color: var(--nonu-error);
+}
+
+.svn-confirm-title {
+  font-weight: 600;
+  font-size: var(--nonu-text-base);
+}
+
+.svn-confirm-message {
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.svn-confirm-dialog .svn-auth-actions {
+  flex-wrap: nowrap;
+}
+
+.svn-confirm-dialog .svn-auth-actions > * {
+  white-space: nowrap;
+}
+
+.svn-confirm-btn--danger {
+  background: var(--nonu-error) !important;
+  border-color: var(--nonu-error) !important;
+  color: #fff !important;
+}

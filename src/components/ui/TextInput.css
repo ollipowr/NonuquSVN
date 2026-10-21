@@ -1,0 +1,52 @@
+/* ── Base (text input and textarea) ───────────────────────────────────── */
+.svn-input {
+  box-sizing: border-box;
+  min-width: 0;
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text);
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  padding: 5px 7px;
+  font: inherit;
+  font-size: var(--nonu-text-md);
+  outline: none;
+}
+
+.svn-input:focus {
+  border-color: var(--nonu-primary);
+}
+
+.svn-input::placeholder {
+  color: var(--nonu-text-faint);
+}
+
+.svn-input:disabled {
+  opacity: 0.5;
+}
+
+/* ── Size and font ────────────────────────────────────────────────────── */
+.svn-input--sm {
+  padding: 3px 6px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-input--mono {
+  font-family: var(--nonu-font-mono, monospace);
+}
+
+/* ── Variant: bare (frameless, the host container draws the frame) ───── */
+.svn-input--bare {
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* ── Textarea ─────────────────────────────────────────────────────────── */
+.svn-input--area {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  resize: vertical;
+  overflow-y: auto;
+}

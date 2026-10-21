@@ -1,0 +1,119 @@
+.svn-context-menu {
+  position: fixed;
+  z-index: 1000;
+  background: var(--nonu-bg);
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px color-mix(in srgb, black 35%, transparent);
+  padding: 4px;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.svn-context-menu-group {
+  position: relative;
+}
+
+/* Flyout opens to the right on hover; same surface as the root menu. */
+.svn-context-menu-flyout {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  left: calc(100% + 4px);
+  top: -5px;
+  min-width: 210px;
+  /* Absolute boxes shrink to the parent's width, which wrapped longer labels. */
+  width: max-content;
+  padding: 4px;
+  background: var(--nonu-bg);
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px color-mix(in srgb, black 35%, transparent);
+}
+
+/* Invisible bridge across the gap so the hover survives the move into the flyout. */
+.svn-context-menu-flyout::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 8px;
+}
+
+.svn-context-menu-group:hover > .svn-context-menu-flyout {
+  display: flex;
+}
+
+.svn-context-menu-group > .svn-context-menu-item {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.svn-context-menu-chevron {
+  color: var(--nonu-text-faint);
+  font-size: var(--nonu-icon-sm);
+}
+
+.svn-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--nonu-text);
+  text-align: left;
+  padding: 5px 8px;
+  font: inherit;
+  font-size: var(--nonu-text-md);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.svn-context-menu-item:hover {
+  background: var(--nonu-bg-secondary);
+}
+
+.svn-context-menu-hint {
+  margin-left: auto;
+  padding-left: 16px;
+  color: var(--nonu-text-faint);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-context-menu-icon {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-lg);
+}
+
+/* Scoped data-theme re-resolves the --nonu-* vars, so no colors are duplicated here. */
+.svn-context-menu-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  border: 1px solid var(--nonu-border);
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--nonu-bg-tertiary) 50%,
+    var(--nonu-primary) 50%
+  );
+}
+
+.svn-context-menu-separator {
+  height: 1px;
+  background: var(--nonu-border);
+  margin: 4px 0;
+}
+
+.svn-context-menu-check {
+  width: 15px;
+  color: var(--nonu-primary);
+}
+
+.svn-context-menu-item--checked {
+  color: var(--nonu-primary);
+  background: color-mix(in srgb, var(--nonu-primary) 10%, transparent);
+}

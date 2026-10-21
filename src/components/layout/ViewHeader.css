@@ -1,0 +1,28 @@
+.svn-view-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--nonu-border);
+  background: var(--nonu-bg-secondary);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.svn-view-header-title {
+  font-size: var(--nonu-text-md);
+  font-weight: 600;
+}
+
+.svn-view-header-subtitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--nonu-text-sm);
+  opacity: 0.6;
+}
+
+.svn-view-header-spacer {
+  flex: 1;
+}

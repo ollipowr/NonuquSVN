@@ -1,0 +1,34 @@
+.svn-file-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 10px;
+  color: var(--nonu-text-muted);
+  background: var(--nonu-bg);
+}
+.svn-file-filter:focus-within {
+  border-color: var(--nonu-primary);
+}
+.svn-file-filter__icon {
+  flex-shrink: 0;
+  font-size: var(--nonu-icon-sm);
+}
+.svn-file-filter__input {
+  flex: 1;
+}
+.svn-file-filter__clear {
+  display: flex;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.svn-file-filter__clear:hover {
+  color: var(--nonu-text);
+}
+.svn-file-filter__clear .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm);
+}

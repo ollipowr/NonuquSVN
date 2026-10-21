@@ -1,0 +1,29 @@
+.svn-workspace-copy-status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.svn-workspace-change-badge,
+.svn-workspace-update-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  font-size: var(--nonu-text-xs);
+  font-weight: 700;
+}
+
+.svn-workspace-change-badge {
+  background: var(--nonu-bg-hover);
+  color: var(--nonu-text);
+}
+
+.svn-workspace-update-badge {
+  color: var(--nonu-primary);
+}

@@ -1,0 +1,370 @@
+/* Merge fills the workspace panel and leaves room for operation output. */
+.svn-merge-view {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.svn-merge-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.svn-merge-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.svn-merge-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-faint);
+}
+
+.svn-merge-step {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.svn-merge-step-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: var(--nonu-text-xs);
+}
+
+.svn-merge-step--active {
+  color: var(--nonu-primary);
+  font-weight: 600;
+}
+
+.svn-merge-step--done {
+  color: var(--nonu-success);
+}
+
+.svn-merge-body select {
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text);
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  padding: 5px 7px;
+  font: inherit;
+  font-size: var(--nonu-text-md);
+}
+
+.svn-merge-arrow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: var(--nonu-text-faint);
+}
+
+.svn-merge-repos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.svn-merge-repo-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  background: var(--nonu-bg-secondary);
+}
+
+label.svn-merge-repo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.svn-merge-repo-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.svn-merge-repo-role {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-merge-error {
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-error);
+  line-height: 1.5;
+}
+
+.svn-merge-status-slot {
+  min-height: 17px;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-error);
+  line-height: 1.5;
+}
+
+.svn-merge-actions {
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+}
+
+.svn-merge-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.svn-merge-inline-status {
+  min-width: 0;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  line-height: 1.4;
+}
+
+.svn-merge-inline-status--loading {
+  color: var(--nonu-text-muted);
+}
+
+/* Overlay at the bottom of the body; it is out of flow, so it never shifts content. */
+.svn-merge-body > .svn-merge-progress {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  border-radius: 2px;
+}
+
+.svn-merge-inline-status:empty {
+  min-width: 1px;
+}
+
+.svn-merge-guard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--nonu-error);
+  border-radius: 6px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-merge-guard .material-symbols-outlined {
+  color: var(--nonu-error);
+  font-size: var(--nonu-icon-md);
+}
+
+.svn-merge-guard .svn-auth-actions {
+  grid-column: 2;
+}
+
+.svn-merge-checking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.svn-merge-checking .svn-head-spinner {
+  display: inline-block;
+  margin-left: 0;
+}
+
+.svn-merge-update-list {
+  margin: 12px 0;
+}
+
+.svn-merge-update-list .svn-merge-repo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  background: var(--nonu-bg-tertiary);
+}
+
+.svn-merge-update-repo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  min-height: 72px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  background: var(--nonu-bg-secondary);
+}
+
+.svn-merge-update-repo--current {
+  border-color: var(--nonu-success);
+}
+
+.svn-merge-repo-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.svn-merge-repo-summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.svn-merge-repo-summary .material-symbols-outlined {
+  font-size: var(--nonu-text-lg);
+}
+
+.svn-merge-status--current {
+  color: var(--nonu-success) !important;
+}
+
+.svn-merge-update-list .svn-merge-repo-card > span:not(.svn-merge-repo-role) {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-merge-revbar,
+.svn-merge-footbar,
+.svn-merge-previewhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+  flex-wrap: wrap;
+}
+
+.svn-merge-revbar-spacer {
+  flex: 1;
+}
+
+.svn-merge-filelist {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+}
+
+.svn-merge-revisions-step {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.svn-merge-revisions-step .svn-log-left-pane {
+  flex: 1;
+  min-height: 0;
+}
+
+.svn-merge-merged-count {
+  color: var(--nonu-success);
+  font-size: var(--nonu-text-xs);
+  white-space: nowrap;
+}
+
+.svn-merge-warn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--nonu-bg-tertiary);
+  font-size: var(--nonu-text-sm);
+  line-height: 1.5;
+}
+
+.svn-merge-warn .material-symbols-outlined {
+  font-size: var(--nonu-text-lg);
+  color: var(--nonu-primary);
+}
+
+.svn-merge-conflicts {
+  color: var(--nonu-error);
+  font-weight: 600;
+}
+
+.svn-merge-clean {
+  color: var(--nonu-success);
+}
+
+.svn-merge-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-merge-file-action {
+  width: 14px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--nonu-text-muted);
+}
+
+.svn-merge-file-action--C {
+  color: var(--nonu-error);
+}
+
+.svn-merge-file-action--A {
+  color: var(--nonu-success);
+}
+
+.svn-merge-file-path {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+}
+
+.svn-merge-context {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  background: var(--nonu-bg-secondary);
+}
+.svn-merge-context span {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  overflow-wrap: anywhere;
+}

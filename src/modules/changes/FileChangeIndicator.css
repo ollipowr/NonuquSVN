@@ -1,0 +1,25 @@
+.svn-file-change-indicator {
+  display: inline-block;
+  min-width: 1ch;
+  font: 700 11px / 1 var(--nonu-font-mono, monospace);
+  text-align: center;
+}
+.svn-file-change-indicator--added {
+  color: var(--nonu-success);
+}
+.svn-file-change-indicator--deleted,
+.svn-file-change-indicator--conflicted {
+  color: var(--nonu-error);
+}
+.svn-file-change-indicator--modified {
+  color: var(--nonu-warning);
+}
+.svn-file-change-indicator--merged {
+  color: var(--nonu-primary);
+}
+.svn-file-change-indicator--muted {
+  color: var(--nonu-text-faint);
+}
+.svn-file-change-indicator--external {
+  color: var(--nonu-external, var(--nonu-info, var(--nonu-primary)));
+}

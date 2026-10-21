@@ -1,0 +1,132 @@
+.svn-titlebar-ws.svn-workspace-bar {
+  box-sizing: border-box;
+  height: 52px;
+  gap: 8px;
+  padding: 5px 10px;
+}
+
+.svn-workspace-bar .svn-workspace-project-select,
+.svn-workspace-bar .svn-workspace-select {
+  flex: 0 1 240px;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.svn-workspace-bar .svn-select-trigger {
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 4px 9px;
+  gap: 7px;
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 5px;
+}
+
+.svn-workspace-bar .svn-select-trigger:hover:not(.is-open) {
+  background: var(--nonu-bg-hover);
+}
+
+.svn-workspace-bar .svn-select-trigger.is-open {
+  background: var(--nonu-bg-tertiary);
+}
+
+.svn-workspace-bar .svn-select-trigger:focus-visible {
+  outline: 2px solid var(--nonu-primary);
+  outline-offset: 2px;
+}
+
+.svn-workspace-choice-icon {
+  flex: none;
+  color: var(--nonu-primary);
+  font-size: 18px;
+}
+
+.svn-workspace-choice-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.svn-workspace-choice-kicker {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-xs);
+  line-height: 1;
+}
+
+.svn-workspace-choice-text .svn-select-label {
+  color: var(--nonu-text);
+  font-size: var(--nonu-text-base);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.svn-workspace-bar .svn-select-popup {
+  top: calc(100% + 8px);
+  width: max(100%, 300px);
+  max-width: min(380px, 90vw);
+  padding: 5px;
+  border-radius: 7px;
+}
+
+.svn-workspace-bar .svn-select-panel-head {
+  padding: 7px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid var(--nonu-border);
+  margin-bottom: 3px;
+}
+
+.svn-workspace-bar .svn-select-panel-head strong {
+  color: var(--nonu-text);
+  font-size: var(--nonu-text-base);
+}
+
+.svn-workspace-bar .svn-select-panel-head span {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  line-height: 1.4;
+}
+
+.svn-workspace-bar .svn-select-popup .svn-menu-item {
+  min-height: 32px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: var(--nonu-text-md);
+}
+
+.svn-workspace-bar .svn-select-row-icon {
+  flex: none;
+  color: var(--nonu-text-muted);
+  font-size: 16px;
+}
+
+.svn-workspace-bar .svn-select-popup [aria-selected="true"] {
+  background: var(--nonu-bg-hover);
+}
+
+.svn-workspace-bar .svn-menu-sep {
+  margin: 5px 3px;
+}
+
+.svn-workspace-bar .svn-select-popup > button:last-child {
+  color: var(--nonu-primary);
+  font-weight: 600;
+}
+
+.svn-workspace-bar .svn-titlebar-btn {
+  height: 28px;
+  margin-left: 4px;
+}
+
+.svn-workspace-bar .svn-workspace-up-to-date:disabled {
+  background: transparent;
+  border: 1px solid var(--nonu-border);
+  color: var(--nonu-text-muted);
+  opacity: 1;
+}

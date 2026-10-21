@@ -1,0 +1,25 @@
+/* Height is reserved in every state; only the active state paints and animates. */
+.svn-progress-bar {
+  height: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.svn-progress-bar--active {
+  background: linear-gradient(90deg, var(--nonu-primary) 0%, transparent 100%);
+  animation: svn-progress-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes svn-progress-slide {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+}

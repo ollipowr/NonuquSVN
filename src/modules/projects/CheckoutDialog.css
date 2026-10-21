@@ -1,0 +1,65 @@
+.dialog-box.svn-checkout-dialog {
+  max-width: 520px;
+}
+
+.svn-checkout-explain {
+  margin: 0 0 12px;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-checkout-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-checkout-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.svn-checkout-row .svn-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.svn-checkout-list {
+  display: grid;
+  gap: 2px;
+  max-height: 240px;
+  overflow: auto;
+  margin-bottom: 8px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+}
+
+.svn-checkout-item {
+  padding: 4px 8px;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-checkout-muted {
+  margin: 0;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-checkout-notice {
+  margin: 8px 0 0;
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-checkout-notice--error {
+  color: var(--nonu-error);
+}
+
+.svn-checkout-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}

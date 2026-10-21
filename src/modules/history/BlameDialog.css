@@ -1,0 +1,38 @@
+.svn-blame-row {
+  display: grid;
+  grid-template-columns: 44px 48px 110px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.svn-blame-row:hover {
+  background: var(--nonu-bg-tertiary);
+}
+
+.svn-blame-lineno {
+  color: var(--nonu-text-muted);
+  text-align: right;
+  user-select: none;
+}
+
+.svn-blame-rev {
+  color: var(--nonu-primary);
+  font-weight: 600;
+}
+
+.svn-blame-author {
+  color: var(--nonu-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.svn-blame-text {
+  color: var(--nonu-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

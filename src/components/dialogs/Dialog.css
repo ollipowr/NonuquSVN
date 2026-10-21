@@ -1,0 +1,63 @@
+.dialog-overlay,
+.svn-auth-overlay {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, black 45%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+}
+
+.dialog-box {
+  background: var(--nonu-bg);
+  border: 1px solid var(--nonu-border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px color-mix(in srgb, black 40%, transparent);
+  overflow: hidden;
+}
+
+.dialog-box--wide {
+  max-width: 900px;
+}
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--nonu-border);
+  font-weight: 600;
+  font-size: var(--nonu-text-md);
+  flex-shrink: 0;
+}
+
+.dialog-body {
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  font-size: var(--nonu-text-md);
+  color: var(--nonu-text);
+  flex: 1;
+  min-height: 0;
+}
+
+.svn-tree-conflict-msg {
+  margin: 0 0 14px;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+  line-height: 1.55;
+}
+
+.svn-tree-conflict-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

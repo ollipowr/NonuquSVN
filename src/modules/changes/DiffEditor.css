@@ -1,0 +1,504 @@
+/* Diff layout */
+
+.svn-diff {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.svn-diff--collapsed {
+  flex: 0 0 auto;
+}
+
+.svn-diff-collapse-bar {
+  background: var(--nonu-bg-secondary);
+  color: var(--nonu-text-muted);
+  border: none;
+  border-left: 1px solid var(--nonu-border);
+  padding: 8px 4px;
+  width: 26px;
+  height: 100%;
+  font: inherit;
+  font-size: var(--nonu-text-sm);
+  font-family: var(--nonu-font-mono, monospace);
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-align: center;
+}
+
+.svn-diff-collapse-bar:hover {
+  color: var(--nonu-text);
+}
+
+.svn-diff-head {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--nonu-border);
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  font-family: var(--nonu-font-mono, monospace);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.svn-diff-head-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  direction: rtl;
+  text-align: left;
+}
+
+.svn-diff-readonly {
+  color: var(--nonu-text-faint);
+  font-size: var(--nonu-icon-sm);
+  flex-shrink: 0;
+}
+
+.svn-diff-collapse {
+  background: none;
+  border: none;
+  color: var(--nonu-text-muted);
+  cursor: pointer;
+  font-size: var(--nonu-text-sm);
+  flex-shrink: 0;
+}
+.svn-diff-collapse {
+  display: none;
+}
+
+.svn-diff-collapse:hover {
+  color: var(--nonu-text);
+}
+
+.svn-diff-body {
+  flex: 1;
+  overflow: auto;
+  margin: 0;
+  padding: 4px 0;
+  font-family: var(--nonu-editor-font, var(--nonu-font-mono, monospace));
+  font-size: var(--nonu-text-md);
+  line-height: 1.5;
+  white-space: pre;
+  min-height: 0;
+  background: var(--nonu-editor-bg, var(--nonu-bg));
+  color: var(--nonu-text);
+}
+.svn-diff-body--split {
+  display: flex;
+  padding: 0;
+}
+.svn-diff-body--split .svn-split-pane {
+  overflow: auto;
+}
+.svn-diff-pane-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--nonu-border);
+  background: var(--nonu-bg-secondary);
+  color: var(--nonu-text-muted);
+  font: 600 var(--nonu-text-sm) var(--nonu-font-mono, monospace);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.svn-line {
+  display: flex;
+  min-width: max-content;
+}
+.svn-ln {
+  flex: 0 0 4ch;
+  padding-right: 8px;
+  text-align: right;
+  color: var(--nonu-text-faint);
+  user-select: none;
+}
+.svn-sign {
+  flex: 0 0 2ch;
+  text-align: center;
+  user-select: none;
+}
+.svn-code-text {
+  padding-right: 12px;
+}
+.svn-diff-add {
+  background: color-mix(in srgb, var(--nonu-success, #4ade80) 12%, transparent);
+}
+.svn-diff-del {
+  background: color-mix(in srgb, var(--nonu-error, #f87171) 12%, transparent);
+}
+.svn-diff-add .svn-sign {
+  color: var(--nonu-success, #4ade80);
+}
+.svn-diff-del .svn-sign {
+  color: var(--nonu-error, #f87171);
+}
+.svn-diff-meta {
+  color: var(--nonu-text-muted);
+  font-weight: 600;
+}
+.svn-diff-hunk {
+  color: var(--nonu-primary);
+  background: color-mix(in srgb, var(--nonu-primary) 8%, transparent);
+}
+.svn-diff-meta .svn-code-text,
+.svn-diff-hunk .svn-code-text {
+  padding-left: 10ch;
+}
+
+/* highlight.js tokens */
+.hljs-comment,
+.hljs-quote {
+  color: var(--nonu-text-faint);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-built_in {
+  color: #c678dd;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-attr {
+  color: #98c379;
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-attribute {
+  color: #d19a66;
+}
+.hljs-title,
+.hljs-name,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: #61afef;
+}
+.hljs-variable,
+.hljs-property,
+.hljs-params {
+  color: #e06c75;
+}
+.hljs-type,
+.hljs-tag {
+  color: #e5c07b;
+}
+
+/* Diff mode toggle + split view */
+.svn-mode-toggle {
+  display: inline-flex;
+  margin-left: auto;
+  margin-right: 6px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.svn-diff-hint {
+  padding: 6px 10px;
+  font-size: var(--nonu-text-md);
+  color: var(--nonu-text-muted);
+  background: color-mix(in srgb, var(--nonu-primary) 8%, transparent);
+}
+.svn-split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.svn-split-pane {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.svn-split-pane + .svn-split-pane {
+  border-left: 1px solid var(--nonu-border);
+}
+.svn-split-same {
+  color: var(--nonu-text-muted);
+}
+.svn-split-empty {
+  background: color-mix(in srgb, var(--nonu-text) 5%, transparent);
+}
+
+.svn-diff-head .svn-mode-toggle {
+  margin-left: 0;
+}
+.svn-diff-head .svn-mode-toggle:first-of-type {
+  margin-left: auto;
+}
+
+/* Focused change block frame */
+.svn-change-focus {
+  box-shadow:
+    inset 2px 0 0 var(--nonu-primary),
+    inset -2px 0 0 var(--nonu-primary);
+}
+.svn-change-focus.svn-change-start {
+  box-shadow:
+    inset 2px 0 0 var(--nonu-primary),
+    inset -2px 0 0 var(--nonu-primary),
+    inset 0 2px 0 var(--nonu-primary);
+}
+.svn-change-focus.svn-change-end {
+  box-shadow:
+    inset 2px 0 0 var(--nonu-primary),
+    inset -2px 0 0 var(--nonu-primary),
+    inset 0 -2px 0 var(--nonu-primary);
+}
+.svn-change-focus.svn-change-start.svn-change-end {
+  box-shadow: inset 0 0 0 2px var(--nonu-primary);
+}
+
+/* CodeMirror-backed diff panes */
+.svn-cm-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.svn-cm-host {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.svn-cm-host .cm-editor {
+  flex: 1;
+  min-height: 0;
+}
+.svn-cm-split .cm-scroller {
+  overflow-x: scroll;
+}
+.svn-cm-split .svn-split-pane:first-child .cm-gutters {
+  user-select: none;
+}
+.cm-gutterElement.svn-diff-add,
+.cm-gutterElement.svn-diff-del {
+  color: var(--nonu-text-muted);
+}
+.svn-cm-sign .cm-gutterElement {
+  padding: 0 4px;
+  text-align: center;
+  min-width: 2ch;
+}
+.svn-cm-fold {
+  height: 18px;
+  line-height: 18px;
+  padding: 0 12px 0 6px;
+  color: var(--nonu-text-muted);
+  background: color-mix(in srgb, var(--nonu-primary) 8%, transparent);
+  cursor: pointer;
+  font-style: italic;
+}
+.svn-cm-fold:hover {
+  color: var(--nonu-text);
+}
+.svn-editor-error {
+  color: var(--nonu-error, #f87171);
+  font-size: var(--nonu-text-md);
+}
+
+/* Merge-conflict overlay (src/conflicts.ts) */
+.svn-cm-wrap {
+  --svn-mine: #3b82f6;
+  --svn-theirs: #f59e0b;
+  --svn-mine-soft: color-mix(in srgb, var(--svn-mine) 45%, transparent);
+  --svn-theirs-soft: color-mix(in srgb, var(--svn-theirs) 45%, transparent);
+}
+.svn-cm-wrap .cm-editor .cm-panels,
+.svn-cm-wrap .cm-editor .cm-panels-top {
+  background-color: var(--nonu-bg-secondary);
+  color: var(--nonu-text);
+  border-color: var(--nonu-border);
+}
+.svn-conflict-bar {
+  background-color: var(--nonu-bg-secondary);
+  color: var(--nonu-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: var(--nonu-text-md);
+  font-family: var(--nonu-font-ui, inherit);
+}
+.svn-conflict-info {
+  color: var(--nonu-text-muted);
+}
+.svn-conflict-done {
+  color: var(--nonu-success, #4ade80);
+  font-weight: 600;
+}
+.svn-conflict-spacer {
+  flex: 1;
+}
+.svn-conflict-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 2px 10px;
+  box-sizing: border-box;
+  font-size: var(--nonu-text-sm);
+  font-family: var(--nonu-font-ui, inherit);
+}
+.svn-conflict-head {
+  background: color-mix(in srgb, var(--svn-mine) 14%, var(--nonu-bg));
+  border-top: 1px solid color-mix(in srgb, var(--svn-mine) 45%, transparent);
+}
+.svn-conflict-raw-head {
+  background: var(--nonu-bg-secondary);
+}
+.svn-conflict-sep {
+  background: color-mix(in srgb, var(--svn-theirs) 14%, var(--nonu-bg));
+  border-top: 1px dashed var(--nonu-border);
+}
+.svn-conflict-base {
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text-faint);
+  font-style: italic;
+}
+.svn-conflict-tail {
+  min-height: 0;
+  height: 4px;
+  padding: 0;
+  background: var(--nonu-bg-tertiary);
+}
+.svn-conflict-label {
+  font-weight: 600;
+}
+.svn-conflict-label-mine {
+  color: var(--svn-mine);
+}
+.svn-conflict-label-theirs {
+  color: var(--svn-theirs);
+}
+.svn-conflict-label-raw {
+  color: var(--nonu-text-muted);
+}
+.cm-line.svn-conflict-base-line {
+  color: var(--nonu-text-muted);
+}
+.svn-conflict-col.svn-conflict-base-col {
+  color: var(--nonu-text-muted);
+  background: color-mix(in srgb, var(--nonu-text-muted) 10%, transparent);
+}
+.svn-conflict-num-base {
+  color: var(--nonu-text-muted);
+}
+.svn-conflict-col.svn-conflict-mine {
+  color: var(--svn-mine);
+  background: color-mix(in srgb, var(--svn-mine) 8%, transparent);
+}
+.svn-conflict-col.svn-conflict-theirs {
+  color: var(--svn-theirs);
+  background: color-mix(in srgb, var(--svn-theirs) 8%, transparent);
+}
+.cm-line.svn-conflict-mine {
+  color: var(--svn-mine);
+}
+.cm-line.svn-conflict-theirs {
+  color: var(--svn-theirs);
+}
+.svn-conflict-marker {
+  background: color-mix(in srgb, var(--nonu-text-muted) 18%, transparent);
+}
+.svn-conflict-word-mine {
+  background: color-mix(in srgb, var(--svn-mine) 18%, transparent);
+  border-radius: 2px;
+}
+.svn-conflict-word-theirs {
+  background: color-mix(in srgb, var(--svn-theirs) 18%, transparent);
+  border-radius: 2px;
+}
+.svn-conflict-mine-word {
+  background: color-mix(in srgb, var(--svn-mine) 18%, transparent);
+  border-radius: 2px;
+}
+.svn-conflict-theirs-word {
+  background: color-mix(in srgb, var(--svn-theirs) 18%, transparent);
+  border-radius: 2px;
+}
+.svn-conflict-nav {
+  padding: 1px 6px;
+}
+.svn-conflict-split {
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.svn-conflict-num-split {
+  padding-top: 51px;
+  line-height: 18px;
+}
+.svn-conflict-num-split > div {
+  height: 18px;
+}
+.svn-conflict-split .svn-conflict-head {
+  height: 26px;
+  margin-top: 0;
+  border-top: 0;
+}
+.svn-conflict-num-mine {
+  color: var(--svn-mine);
+}
+.svn-conflict-num-theirs {
+  color: var(--svn-theirs);
+}
+.svn-conflict-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.svn-conflict-col {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0 0 2px;
+}
+.svn-conflict-col-head {
+  height: 22px;
+  line-height: 22px;
+  margin-bottom: 2px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  font-size: var(--nonu-text-sm);
+  font-weight: 600;
+  font-family: var(--nonu-font-ui, inherit);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--nonu-border);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.svn-conflict-col + .svn-conflict-col {
+  border-left: 1px solid var(--nonu-border);
+}
+.svn-conflict-split-line {
+  min-height: 18px;
+  line-height: 18px;
+  padding: 0 12px 0 6px;
+  white-space: pre;
+  font-family: var(--nonu-font-mono, monospace);
+  font-size: var(--nonu-text-md);
+}
+.svn-conflict-split-empty {
+  color: var(--nonu-text-faint);
+  font-style: italic;
+}
+
+/* Both diff renderers share the same adjustable pane proportions. */
+.svn-diff-resizable > .svn-split-pane:first-child {
+  flex: var(--svn-diff-left, 50) 1 0;
+}
+.svn-diff-resizable > .svn-split-pane:last-child {
+  flex: var(--svn-diff-right, 50) 1 0;
+}
+.svn-diff-body--split {
+  overflow: hidden;
+}

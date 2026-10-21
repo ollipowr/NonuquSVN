@@ -1,0 +1,22 @@
+.svn-changes-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--nonu-border);
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  line-height: 1;
+  flex-shrink: 0;
+  height: 26px;
+}
+
+.svn-changes-head--compact {
+  padding: 6px 10px;
+  height: 26px;
+}
+
+.svn-head-spinner {
+  margin-left: auto;
+  color: var(--nonu-primary, #4a9eff);
+}
