@@ -57,15 +57,11 @@ export function CommitComposer({
           }}
         />
         <div className="svn-commit-actions">
-          <Button
-            onClick={onGenerateMessage}
-            disabled={busy || generating || committable.length === 0}
-            title={t('generateMessage') as string}
-          >
-            <span className={generating ? 'svn-magic-spin' : undefined}>
-              ✨
-            </span>
-          </Button>
+          <span title={t('aiComingSoon') as string}>
+            <Button disabled>
+              <span>✨</span>
+            </Button>
+          </span>
           <Button
             variant="primary"
             onClick={onCommit}

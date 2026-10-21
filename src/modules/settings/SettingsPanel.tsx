@@ -31,9 +31,14 @@ function modelsFor(
 
 type Page = 'general' | 'ai' | 'formatter';
 
-const NAV: { id: Page; icon: string; label: Parameters<typeof t>[0] }[] = [
+const NAV: {
+  id: Page;
+  icon: string;
+  label: Parameters<typeof t>[0];
+  disabled?: boolean;
+}[] = [
   { id: 'general', icon: 'tune', label: 'settingsNavGeneral' },
-  { id: 'ai', icon: 'auto_awesome', label: 'settingsNavAi' },
+  { id: 'ai', icon: 'auto_awesome', label: 'settingsNavAi', disabled: true },
   { id: 'formatter', icon: 'code', label: 'settingsFormatterSection' },
 ];
 
@@ -58,7 +63,8 @@ export function SvnSettingsPanel({
   const [page, setPage] = useState<Page>('general');
   const [query, setQuery] = useState('');
   const searching = query.trim() !== '';
-  const show = (p: Page) => searching || page === p;
+  const show = (p: Page) =>
+    !NAV.find((n) => n.id === p)?.disabled && (searching || page === p);
 
   useEffect(() => {
     listAiModels()
@@ -147,6 +153,8 @@ export function SvnSettingsPanel({
             <button
               key={n.id}
               type="button"
+              disabled={n.disabled}
+              title={n.disabled ? (t('aiComingSoon') as string) : undefined}
               className={`svn-settings-nav-item${!searching && page === n.id ? ' svn-settings-nav-item--active' : ''}`}
               onClick={() => {
                 setQuery('');

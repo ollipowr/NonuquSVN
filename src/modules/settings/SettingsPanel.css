@@ -158,3 +158,9 @@
 .svn-settings-textarea {
   margin-top: 8px;
 }
+
+.svn-settings-nav-item:disabled,
+.svn-settings-nav-item:disabled:hover {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

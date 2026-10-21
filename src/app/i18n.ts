@@ -123,6 +123,7 @@ const translations = {
     commitPlaceholder: (n: number) => `Commit-Nachricht für ${n} Datei(en)…`,
     commitNoFiles: 'Versionierte Dateien auswählen, um zu committen…',
     generateMessage: 'Commit-Nachricht mit KI generieren (/svn-message)',
+    aiComingSoon: 'KI-Funktionen sind noch nicht verfügbar.',
     commitButton: (n: number) => `Commit${n > 0 ? ` (${n})` : ''}`,
     commitTooManyFiles: (n: number) =>
       `Zu viele Dateien ausgewählt (${n}), um einzeln zu committen. In kleineren Batches committen.`,
@@ -838,6 +839,7 @@ const translations = {
     commitPlaceholder: (n: number) => `Commit message for ${n} file(s)…`,
     commitNoFiles: 'Select versioned files to commit…',
     generateMessage: 'Generate commit message with AI (/svn-message)',
+    aiComingSoon: 'AI features are not available yet.',
     commitButton: (n: number) => `Commit${n > 0 ? ` (${n})` : ''}`,
     commitTooManyFiles: (n: number) =>
       `Too many files selected (${n}) to commit individually. Commit in smaller batches.`,
