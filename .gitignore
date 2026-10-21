@@ -5,9 +5,12 @@ dist-standalone/
 release/
 build-resources/*
 !build-resources/installer.nsh
+!build-resources/icon.svg
+!build-resources/icon.ico
 !build-resources/shell-extension/
 
 *.test.ts
 *.test.tsx
 *.test.cpp
 scripts/test-shell-extension.ps1
+build-resources/shell-extension/out/

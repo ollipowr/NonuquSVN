@@ -43,6 +43,7 @@
     "oneClick": false,
     "perMachine": false,
     "allowToChangeInstallationDirectory": true,
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "NonuquSVN",
