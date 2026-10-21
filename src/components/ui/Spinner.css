@@ -1,0 +1,17 @@
+.svn-spinner {
+  --svn-spinner-size: 10px;
+  display: inline-block;
+  width: var(--svn-spinner-size);
+  height: var(--svn-spinner-size);
+  flex: 0 0 auto;
+  border: 1.5px solid color-mix(in srgb, currentColor 30%, var(--nonu-border));
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: svn-spinner-rotate 0.7s linear infinite;
+}
+
+@keyframes svn-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

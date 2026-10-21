@@ -1,0 +1,31 @@
+.svn-props-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-props-entry {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.svn-props-entry + .svn-props-entry {
+  border-top: 1px solid var(--nonu-border);
+}
+
+.svn-props-name {
+  font-weight: 600;
+  color: var(--nonu-primary);
+  font-size: var(--nonu-text-sm);
+}
+
+.svn-props-value {
+  font-size: var(--nonu-text-md);
+  line-height: 1.5;
+  color: var(--nonu-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

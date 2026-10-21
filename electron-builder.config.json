@@ -1,0 +1,51 @@
+{
+  "appId": "com.nonuqu.svn",
+  "productName": "NonuquSVN",
+  "copyright": "Copyright © 2026 NonuquSVN contributors",
+  "directories": {
+    "buildResources": "build-resources",
+    "output": "release"
+  },
+  "files": [
+    "dist-electron/**/*",
+    "!dist-electron/renderer/**/*.map"
+  ],
+  "extraResources": [
+    {
+      "from": "build-resources/icon.ico",
+      "to": "icon.ico"
+    },
+    {
+      "from": "build-resources/icon.svg",
+      "to": "icon.svg"
+    },
+    {
+      "from": "build-resources/NonuquShellExtension64.dll",
+      "to": "NonuquShellExtension64.dll"
+    },
+    {
+      "from": "build-resources/NonuquShellExtension32.dll",
+      "to": "NonuquShellExtension32.dll"
+    },
+    {
+      "from": "electron/fonts",
+      "to": "fonts",
+      "filter": ["**/*.woff2"]
+    }
+  ],
+  "win": {
+    "target": [
+      { "target": "nsis", "arch": ["x64"] }
+    ],
+    "icon": "build-resources/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "NonuquSVN",
+    "include": "build-resources/installer.nsh"
+  },
+}

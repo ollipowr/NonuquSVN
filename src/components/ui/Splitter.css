@@ -1,0 +1,64 @@
+.svn-splitter {
+  flex-shrink: 0;
+  background: var(--nonu-bg-secondary);
+  transition: background 0.15s;
+}
+
+.svn-splitter--h {
+  flex: 0 0 6px;
+  cursor: col-resize;
+}
+
+.svn-splitter--v {
+  flex: 0 0 6px;
+  height: 6px;
+  cursor: row-resize;
+}
+
+.svn-splitter--subtle {
+  background: transparent;
+}
+
+.svn-splitter--subtle:not(.svn-splitter--disabled):hover {
+  background: var(--nonu-border);
+}
+
+.svn-splitter--disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.svn-splitter:not(.svn-splitter--disabled):hover {
+  background: var(--nonu-border);
+}
+
+.svn-splitter--ghost {
+  flex: 0 0 0;
+  position: relative;
+}
+
+.svn-splitter--ghost::before {
+  content: "";
+  position: absolute;
+  transition: background 0.15s;
+}
+
+.svn-splitter--ghost.svn-splitter--v::before {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  margin-top: -3px;
+}
+
+.svn-splitter--ghost.svn-splitter--h::before {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+  margin-left: -3px;
+}
+
+.svn-splitter--ghost:not(.svn-splitter--disabled):hover::before {
+  background: var(--nonu-border);
+}

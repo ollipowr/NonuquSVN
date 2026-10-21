@@ -1,0 +1,323 @@
+.svn-home {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background:
+    radial-gradient(
+      ellipse at 12% 0%,
+      color-mix(in srgb, var(--nonu-primary) 7%, transparent),
+      transparent 55%
+    ),
+    var(--nonu-bg);
+}
+.svn-home-content {
+  width: min(900px, 100%);
+  margin: 0 auto;
+  padding: 28px 40px 32px;
+}
+.svn-home-intro {
+  margin: 26px 0 34px;
+}
+.svn-home-intro h1 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  letter-spacing: -0.03em;
+}
+.svn-home-intro p {
+  margin: 0 0 22px;
+  color: var(--nonu-text-muted);
+}
+.svn-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.svn-home-section-title {
+  margin: 30px 0 4px;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  font-weight: 600;
+}
+.svn-home button,
+.svn-home input {
+  font: inherit;
+}
+.svn-home-grow {
+  flex: 1;
+}
+.svn-home-muted {
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-sm);
+  font-weight: 400;
+}
+.svn-home-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.svn-home-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+}
+.svn-home-logo {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  background: var(--nonu-text);
+  mask: url("../../../build-resources/logo.svg") center / 24px no-repeat;
+  -webkit-mask:
+    url("../../../build-resources/logo.svg") center / 24px no-repeat;
+}
+.svn-home-brand-suffix {
+  color: var(--nonu-primary);
+  font-weight: 400;
+}
+.svn-home-error {
+  color: var(--nonu-error);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.svn-home-resume {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--nonu-border);
+  border-left: 3px solid var(--nonu-primary);
+  border-radius: 8px;
+  background: var(--nonu-bg-secondary);
+}
+.svn-home-resume-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.svn-home-label {
+  font-size: var(--nonu-text-xs);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--nonu-text-muted);
+}
+.svn-home-resume strong {
+  font-size: var(--nonu-text-lg);
+  font-weight: 600;
+}
+
+.svn-home-project {
+  margin-top: 14px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 8px;
+  background: var(--nonu-bg-secondary);
+  overflow: hidden;
+}
+.svn-home-project-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+.svn-home-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--nonu-text-muted);
+  cursor: pointer;
+}
+.svn-home-initial {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-primary);
+  font-weight: 650;
+  font-size: var(--nonu-text-sm);
+}
+.svn-home-project-name {
+  font-size: var(--nonu-text-base);
+  font-weight: 600;
+}
+.svn-input.svn-home-rename {
+  padding: 3px 8px;
+  border-color: var(--nonu-primary);
+  border-radius: 6px;
+  background: var(--nonu-bg);
+}
+.svn-home-iconbtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--nonu-text-muted);
+  cursor: pointer;
+}
+.svn-home-iconbtn:hover {
+  background: var(--nonu-bg-hover);
+  color: var(--nonu-text);
+}
+.svn-home-summary {
+  display: flex;
+  gap: 6px;
+}
+
+.svn-home-rows {
+  border-top: 1px solid var(--nonu-border);
+}
+.svn-home-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px 8px 44px;
+  border: 0;
+  border-bottom: 1px solid var(--nonu-border);
+  background: transparent;
+  color: var(--nonu-text);
+  text-align: left;
+  cursor: pointer;
+}
+.svn-home-row:last-child {
+  border-bottom: 0;
+}
+.svn-home-row:hover:not(:disabled) {
+  background: var(--nonu-bg-hover);
+}
+.svn-home-row:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.svn-home-row--current {
+  background: color-mix(in srgb, var(--nonu-primary) 9%, transparent);
+}
+.svn-home-kind {
+  width: 52px;
+  padding: 1px 0;
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--nonu-text-muted);
+}
+.svn-home-kind:empty {
+  visibility: hidden;
+}
+.svn-home-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.svn-home-rev {
+  min-width: 56px;
+  text-align: right;
+  font-size: var(--nonu-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--nonu-text-muted);
+}
+.svn-home-more {
+  width: 100%;
+  padding: 8px 14px 8px 44px;
+  border: 0;
+  border-top: 1px solid var(--nonu-border);
+  background: transparent;
+  color: var(--nonu-primary);
+  font-size: var(--nonu-text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.svn-home-badge {
+  padding: 0 8px;
+  border-radius: 10px;
+  font-size: var(--nonu-text-sm);
+  white-space: nowrap;
+}
+.svn-home-badge--dirty {
+  color: var(--nonu-warning);
+  background: color-mix(in srgb, var(--nonu-warning) 14%, transparent);
+}
+.svn-home-badge--update {
+  color: var(--nonu-primary);
+  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+}
+.svn-home-badge--error {
+  color: var(--nonu-error);
+  background: color-mix(in srgb, var(--nonu-error) 14%, transparent);
+}
+.svn-home-badge--ok {
+  color: var(--nonu-success);
+}
+
+.svn-home-empty {
+  padding: 36px 28px;
+  border: 1px dashed var(--nonu-border);
+  border-radius: 10px;
+}
+.svn-home-empty h2 {
+  margin: 0 0 6px;
+  font-size: var(--nonu-text-lg);
+}
+.svn-home-empty p {
+  margin: 0 0 18px;
+  color: var(--nonu-text-muted);
+  line-height: 1.6;
+}
+.svn-home-empty-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.svn-home-checkout {
+  max-width: 600px;
+  margin: 48px auto;
+  padding: 28px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 12px;
+  background: var(--nonu-bg-secondary);
+}
+.svn-home-checkout .svn-standalone-form {
+  max-width: none;
+  gap: 16px;
+}
+.svn-home-checkout .svn-standalone-form .svn-input {
+  padding: 10px;
+}
+
+@media (max-width: 620px) {
+  .svn-home-content {
+    padding: 20px;
+  }
+  .svn-home-row {
+    padding-left: 20px;
+  }
+  .svn-home-empty-actions {
+    grid-template-columns: 1fr;
+  }
+  .svn-home-checkout {
+    margin: 28px 0;
+    padding: 18px;
+  }
+  .svn-home-checkout .svn-standalone-row {
+    flex-wrap: wrap;
+  }
+}

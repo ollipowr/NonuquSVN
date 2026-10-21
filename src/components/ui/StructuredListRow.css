@@ -1,0 +1,14 @@
+.svn-structured-row {
+  display: grid;
+  grid-template-columns: var(--svn-list-columns);
+  align-items: center;
+  column-gap: 8px;
+  min-width: 0;
+}
+.svn-structured-row > * {
+  min-width: 0;
+}
+.svn-structured-row--active {
+  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+  box-shadow: inset 3px 0 var(--nonu-primary);
+}

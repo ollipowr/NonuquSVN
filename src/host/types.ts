@@ -1,0 +1,74 @@
+export interface ExecResult {
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
+export interface ExecOptions {
+  cwd: string;
+  timeout?: number;
+}
+
+/** Storage abstraction — mirrors the subset used by the panel. */
+export interface HostStorage {
+  get<T>(key: string): T | undefined;
+  set(key: string, value: unknown): Promise<void>;
+  getGlobal<T>(key: string): T | undefined;
+  setGlobal(key: string, value: unknown): Promise<void>;
+}
+
+/** AI provider abstraction. v1 Electron adapter returns null (feature hidden). */
+export interface AiProvider {
+  sendPrompt(opts: {
+    prompt: string;
+    sessionName: string;
+    provider: string;
+    model?: string;
+  }): Promise<{ response: string }>;
+  listModels(): Promise<{ id: string; name: string; provider: string }[]>;
+}
+
+/** The host APIs the SVN panel uses. Both the extension adapter and the Electron adapter implement this. */
+export interface HostAdapter {
+  /** Absolute path of the current workspace / working directory. */
+  workspacePath: string;
+
+  /** Run an arbitrary shell command and return its output. */
+  exec(command: string, opts: ExecOptions): Promise<ExecResult>;
+
+  /** Run SVN with an argv array, bypassing the platform shell. */
+  execSvnArgs?(args: string[], opts: ExecOptions): Promise<ExecResult>;
+
+  /** Reads modification times without a platform shell. Optional: without it the list has no mtime sorting. */
+  getModificationTimes?(
+    paths: string[],
+    cwd: string,
+  ): Promise<Record<string, number>>;
+
+  /** Observes working-copy changes. Hosts may coalesce events and should ignore `.svn`. */
+  watchWorkspace?(cwd: string, onChange: () => void): () => void;
+
+  /** Persistent key-value storage scoped to the current workspace + a global namespace. */
+  storage: HostStorage;
+
+  /** Opens a file in the host editor or file manager (Electron: the default app via `shell.openPath`). */
+  openFile(path: string): void | Promise<void>;
+
+  /** Writes a file at the given absolute path. */
+  writeFile(absolutePath: string, content: string): Promise<void>;
+
+  /** Read a file as base64 without starting a shell process. */
+  readFileBase64(absolutePath: string): Promise<string>;
+
+  /** Read the pristine SVN BASE version as base64 without shell encoding loss. */
+  svnCatBase64(path: string, cwd: string): Promise<string>;
+
+  /** Shows a toast; a no-op is acceptable in both adapters. */
+  notify(kind: 'info' | 'error', message: string): void;
+
+  /** Open a native folder picker and return the chosen path, or null if cancelled. */
+  chooseFolder?(): Promise<string | null>;
+
+  /** AI provider: null in the Electron standalone, where the feature is hidden. */
+  ai: AiProvider | null;
+}

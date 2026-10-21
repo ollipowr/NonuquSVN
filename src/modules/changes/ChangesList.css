@@ -1,0 +1,250 @@
+.svn-changes-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  outline: none;
+}
+
+.svn-row {
+  padding: 3px 10px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  user-select: none;
+}
+
+.svn-row:hover {
+  background: var(--nonu-bg-secondary);
+}
+.svn-row--active {
+  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+  border-left: 3px solid var(--nonu-primary);
+  padding-left: 9px;
+  font-weight: 600;
+}
+.svn-row--checked {
+  background: color-mix(in srgb, var(--nonu-primary) 6%, transparent);
+}
+.svn-row.svn-row--highlighted {
+  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 12%, transparent);
+}
+.svn-row.svn-row--highlighted.svn-row--checked {
+  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 18%, transparent);
+}
+.svn-row.svn-row--menu-target {
+  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 10%, transparent);
+}
+.svn-row--indented {
+  padding-left: 24px;
+}
+/* Themed checkbox: native box replaced so unchecked state follows the theme. */
+.svn-row input[type="checkbox"],
+.svn-changes-head input[type="checkbox"] {
+  appearance: none;
+  flex-shrink: 0;
+  position: relative;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  border: 1px solid var(--nonu-border);
+  border-radius: 3px;
+  background: var(--nonu-bg-secondary);
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+.svn-row input[type="checkbox"]:hover,
+.svn-changes-head input[type="checkbox"]:hover {
+  border-color: var(--nonu-text-muted);
+  background: var(--nonu-bg-tertiary);
+}
+.svn-row input[type="checkbox"]:checked,
+.svn-changes-head input[type="checkbox"]:checked {
+  background: var(--nonu-primary);
+  border-color: var(--nonu-primary);
+}
+/* Check drawn as a masked fill so it takes the theme color and scales cleanly. */
+.svn-row input[type="checkbox"]:checked::after,
+.svn-changes-head input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--nonu-on-primary);
+  -webkit-mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.5 8.5 2.5' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.5 8.5 2.5' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.svn-row input[type="checkbox"]:focus-visible,
+.svn-changes-head input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--nonu-primary);
+  outline-offset: 1px;
+}
+.svn-row input[type="checkbox"]:disabled,
+.svn-changes-head input[type="checkbox"]:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.svn-code {
+  width: 14px;
+  display: grid;
+  place-items: center;
+}
+.svn-file-icon {
+  font-size: var(--nonu-icon-md);
+  color: var(--nonu-text-muted);
+}
+.svn-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--nonu-font-mono, monospace);
+  font-size: var(--nonu-text-sm);
+  min-width: 0;
+  direction: rtl;
+  text-align: left;
+}
+.svn-lock-indicator {
+  font-size: var(--nonu-icon-sm, 14px);
+  vertical-align: -2px;
+  margin-left: 4px;
+  color: var(--nonu-warning);
+}
+.svn-mtime {
+  width: 116px;
+  overflow: hidden;
+  text-align: right;
+  font-family: var(--nonu-font-mono, monospace);
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-faint);
+  opacity: 0.6;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.svn-mtime--empty {
+  visibility: hidden;
+}
+.svn-row-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 16px);
+  column-gap: 2px;
+  width: 68px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.svn-row:hover .svn-row-actions,
+.svn-row--active .svn-row-actions {
+  opacity: 1;
+}
+.svn-row-action-slot {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 19px;
+  overflow: hidden;
+}
+.svn-row-action-slot .svn-btn.svn-btn--ghost {
+  padding: 0;
+  height: 19px;
+  width: 16px;
+}
+.svn-row-action-slot .svn-btn.svn-btn--ghost .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm);
+}
+
+.svn-folder-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 3px 8px;
+  background: var(--nonu-bg-secondary);
+  border: none;
+  border-bottom: 1px solid var(--nonu-border);
+  color: var(--nonu-text-muted);
+  font: inherit;
+  font-size: var(--nonu-text-sm);
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+}
+.svn-folder-row:hover {
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text);
+}
+.svn-folder-row--menu-target {
+  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 10%, transparent);
+}
+.svn-folder-chevron {
+  font-size: var(--nonu-icon-md);
+  flex-shrink: 0;
+  color: var(--nonu-text-muted);
+}
+.svn-folder-icon {
+  font-size: var(--nonu-text-base);
+  flex-shrink: 0;
+  color: var(--nonu-primary);
+  opacity: 0.7;
+}
+.svn-folder-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--nonu-font-mono, monospace);
+  min-width: 0;
+}
+.svn-folder-count {
+  flex-shrink: 0;
+  font-size: var(--nonu-text-xs);
+  color: var(--nonu-text-faint);
+  background: var(--nonu-bg-tertiary);
+  border-radius: 8px;
+  padding: 0 5px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.svn-row-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  border-left: 2px solid transparent;
+  pointer-events: none;
+}
+.svn-row-skeleton__bar {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--nonu-text) 12%, transparent);
+  animation: svn-skeleton-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.svn-row-skeleton__bar--checkbox {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+}
+.svn-row-skeleton__bar--code {
+  width: 14px;
+  height: 11px;
+}
+.svn-row-skeleton__bar--icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+}
+.svn-row-skeleton__bar--path {
+  height: 11px;
+  flex-shrink: 1;
+}
+@keyframes svn-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.12;
+  }
+}

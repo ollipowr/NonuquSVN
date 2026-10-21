@@ -1,0 +1,236 @@
+/* Activity bar: full-height vertical view switcher left of the whole panel. */
+
+.svn-shell {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-width: 0;
+}
+
+.svn-shell > .svn-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto;
+}
+
+/* A non-"changes" view replaces the panel content completely. Overlays
+   (auth/confirm/detail dialogs) stay reachable. */
+.svn-panel--inactive
+> :not(.svn-auth-overlay):not(.svn-detail-overlay):not(.dialog-overlay):not(
+  .svn-branches
+):not(.svn-compare):not(.svn-log-view):not(.svn-repo):not(.svn-settings):not(
+  .svn-context-menu
+):not(.svn-project-overview) {
+  display: none !important;
+}
+
+.svn-ab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 48px;
+  padding: 8px 0;
+  background: var(--nonu-bg-secondary);
+  border-right: 1px solid var(--nonu-border);
+}
+
+.svn-ab-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--nonu-text-faint);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.svn-ab-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--nonu-primary);
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.svn-ab-item:hover {
+  background: var(--nonu-bg-hover, var(--nonu-bg-tertiary));
+  color: var(--nonu-text);
+}
+
+.svn-ab-item:focus-visible {
+  outline: 2px solid var(--nonu-primary);
+  outline-offset: -2px;
+}
+
+.svn-ab-item--active {
+  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+  color: var(--nonu-primary);
+}
+
+.svn-ab-item--active:hover {
+  background: color-mix(in srgb, var(--nonu-primary) 20%, transparent);
+  color: var(--nonu-primary);
+}
+
+.svn-ab-item--active::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.svn-ab-icon {
+  font-size: var(--nonu-icon-lg);
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400;
+}
+
+.svn-ab-item--active .svn-ab-icon {
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 500;
+}
+
+.svn-ab-badge {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: var(--nonu-primary);
+  color: var(--nonu-on-primary);
+  font-size: var(--nonu-text-xs);
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.svn-ab-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.svn-ab-sep {
+  width: 24px;
+  height: 1px;
+  margin: 4px 0;
+  background: var(--nonu-border);
+}
+
+.svn-ab-item:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.svn-ab-item:disabled:hover {
+  background: transparent;
+  color: var(--nonu-text-faint);
+}
+
+/* Context navigation uses readable labels on both levels. */
+.svn-ab {
+  width: 208px;
+  align-items: stretch;
+  padding: 6px 10px 16px;
+}
+.svn-ab-heading {
+  padding: 4px 10px 16px;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.svn-ab-item {
+  width: 100%;
+  min-height: 40px;
+  height: auto;
+  padding: 9px 10px;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+.svn-ab-icon {
+  flex-shrink: 0;
+}
+.svn-ab-label {
+  font-size: var(--nonu-text-sm);
+}
+.svn-ab-badge {
+  position: static;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.svn-ab-footer {
+  align-items: stretch;
+}
+.svn-ab-sep {
+  width: 100%;
+}
+@media (max-width: 800px) {
+  .svn-ab {
+    width: 174px;
+  }
+}
+
+.svn-ab {
+  box-sizing: border-box;
+}
+.svn-ab-project .svn-ab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Collapsed keeps the expanded box sizes so entries do not move on toggle. */
+.svn-ab--collapsed {
+  width: 48px;
+  padding: 6px 5px 16px;
+  align-items: center;
+}
+.svn-ab--collapsed .svn-ab-item {
+  width: 36px;
+  height: auto;
+  min-height: 40px;
+  padding: 0;
+  justify-content: center;
+}
+/* Indicator x matches expanded: items are 6px in, not 10px. */
+.svn-ab--collapsed .svn-ab-item::before {
+  left: -1px;
+}
+.svn-ab--collapsed .svn-ab-label {
+  display: none;
+}
+.svn-ab--collapsed .svn-ab-heading {
+  visibility: hidden;
+}
+.svn-ab--collapsed .svn-ab-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.svn-ab--collapsed .svn-ab-sep {
+  width: 24px;
+}

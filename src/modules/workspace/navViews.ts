@@ -1,0 +1,38 @@
+import { t } from '@nonu/app/i18n';
+import type { ActivityView } from '@nonu/components/layout/ActivityBar';
+import type { WorkspaceViewId } from './WorkspaceView.js';
+export type NavViewId = 'start' | WorkspaceViewId;
+export function buildNavViews(o: {
+  hasWorkspace: boolean;
+  activeView?: NavViewId;
+  changesCount: number;
+}): ActivityView<NavViewId>[] {
+  const disabledTitle = t('navNeedWorkspace') as string;
+  return [
+    {
+      id: 'changes',
+      icon: 'difference',
+      label: t('navLocalChanges') as string,
+      group: 'workspace',
+      badge: o.changesCount,
+      disabled: !o.hasWorkspace,
+      disabledTitle,
+    },
+    {
+      id: 'logs',
+      icon: 'history',
+      label: t('navChangelogs') as string,
+      group: 'workspace',
+      disabled: !o.hasWorkspace,
+      disabledTitle,
+    },
+    {
+      id: 'repo',
+      icon: 'folder_open',
+      label: t('navRepoBrowser') as string,
+      group: 'workspace',
+      disabled: !o.hasWorkspace,
+      disabledTitle,
+    },
+  ];
+}

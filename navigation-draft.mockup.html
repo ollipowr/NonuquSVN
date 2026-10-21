@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nonuqu – Navigationsentwurf</title>
+  <style>
+    :root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #e9edf4; background: #11151b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button { font: inherit; cursor: pointer; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 220px 1fr; }
+    aside { background: #171c24; border-right: 1px solid #2c3440; padding: 20px 12px; }
+    .brand { font-size: 18px; font-weight: 750; padding: 4px 12px 24px; letter-spacing: -.03em; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { border: 0; background: transparent; color: #aab4c2; text-align: left; border-radius: 9px; padding: 11px 13px; }
+    .nav button:hover, .nav button.active { background: #293749; color: #fff; }
+    .section { color: #718094; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 28px 13px 10px; }
+    .workspace { padding: 24px clamp(24px, 5vw, 70px); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 42px; gap: 16px; }
+    .crumb { color: #8e9aaa; font-size: 13px; }
+    .switch { position: relative; }
+    .switch > button, .branch { background: #202833; border: 1px solid #344153; border-radius: 9px; color: #e9edf4; padding: 9px 12px; }
+    .menu { display: none; position: absolute; right: 0; top: 44px; width: 260px; background: #222c38; border: 1px solid #405066; border-radius: 11px; padding: 6px; box-shadow: 0 18px 40px #0008; z-index: 5; }
+    .menu.open { display: grid; }
+    .menu button { background: transparent; border: 0; color: #e9edf4; text-align: left; padding: 10px; border-radius: 7px; }
+    .menu button:hover { background: #334153; }
+    h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.045em; margin: 55px 0 8px; }
+    .sub { color: #9ba8b8; margin: 0 0 34px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+    .primary, .secondary { border-radius: 9px; padding: 11px 16px; font-weight: 650; }
+    .primary { background: #67a5ff; border: 1px solid #67a5ff; color: #101923; }
+    .secondary { background: #202833; border: 1px solid #38475a; color: #e9edf4; }
+    h2 { font-size: 14px; color: #aab7c8; margin: 0 0 14px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; max-width: 940px; }
+    .card { text-align: left; background: #1b222c; border: 1px solid #303d4d; border-radius: 13px; color: inherit; padding: 19px; min-height: 135px; }
+    .card:hover { border-color: #67a5ff; background: #212c3a; }
+    .card strong { display: block; font-size: 17px; margin-bottom: 10px; }
+    .card span { display: block; color: #a6b2c0; font-size: 13px; line-height: 1.5; }
+    .card small { display: block; color: #6e9edc; margin-top: 16px; }
+    .project-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 45px; }
+    .project-head h1 { margin: 0; }
+    .panel { max-width: 940px; border: 1px solid #303d4d; background: #1b222c; border-radius: 13px; padding: 25px; margin-top: 30px; }
+    .panel p { color: #a6b2c0; line-height: 1.6; }
+    .muted { color: #79889a; font-size: 13px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 650px) { .app { grid-template-columns: 72px 1fr; } aside { padding: 20px 7px; } .brand { font-size: 14px; padding-left: 5px; } .nav button { font-size: 0; } .nav button::first-letter { font-size: 18px; } .section { display: none; } .workspace { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">◆ Nonuqu</div>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <button data-view="start" class="active">⌂ &nbsp; Start</button>
+        <div class="section">Aktuelles Projekt</div>
+        <button data-view="overview">▦ &nbsp; Übersicht</button>
+        <button data-view="changes">◌ &nbsp; Änderungen</button>
+        <button data-view="history">◷ &nbsp; Verlauf</button>
+        <button data-view="browser">▤ &nbsp; Repository-Browser</button>
+      </nav>
+    </aside>
+    <main class="workspace">
+      <div class="top">
+        <div class="crumb" id="crumb">Alle Projekte</div>
+        <div class="switch">
+          <button id="switchButton" aria-expanded="false">Nonuqu App ▾</button>
+          <div class="menu" id="menu">
+            <button data-project="Nonuqu App">Nonuqu App</button>
+            <button data-project="Website Relaunch">Website Relaunch</button>
+            <button data-project="Design System">Design System</button>
+            <button data-view="start">Alle Projekte anzeigen →</button>
+          </div>
+        </div>
+      </div>
+      <section id="startView">
+        <h1>Deine Projekte</h1>
+        <p class="sub">Dort weitermachen, wo du aufgehört hast.</p>
+        <div class="actions">
+          <button class="primary" onclick="alert('Entwurf: Dateiauswahl für eine bestehende SVN-Arbeitskopie')">Arbeitskopie öffnen</button>
+          <button class="secondary" onclick="alert('Entwurf: Dialog zum Auschecken eines SVN-Repositories')">Repository auschecken</button>
+        </div>
+        <h2>Zuletzt geöffnet</h2>
+        <div class="cards">
+          <button class="card" data-project="Nonuqu App"><strong>★ &nbsp; Nonuqu App</strong><span>Arbeitskopie · trunk</span><small>Zuletzt: Änderungen →</small></button>
+          <button class="card" data-project="Website Relaunch"><strong>Website Relaunch</strong><span>Arbeitskopie · branches/redesign</span><small>Zuletzt: Verlauf →</small></button>
+          <button class="card" data-project="Design System"><strong>Design System</strong><span>Arbeitskopie · trunk</span><small>Zuletzt: Repository-Browser →</small></button>
+        </div>
+      </section>
+      <section id="projectView" hidden>
+        <div class="project-head"><h1 id="projectTitle">Nonuqu App</h1><button class="branch" id="branchButton">trunk ▾</button></div>
+        <p class="sub" id="projectPath">Aktive Arbeitskopie · Repository-Pfad: /trunk</p>
+        <div class="panel"><h2 id="panelTitle">Übersicht</h2><p id="panelText">Dein Einstieg in dieses Projekt. Die Projektnavigation bleibt verfügbar, auch wenn du zwischendurch auf Start gehst.</p><span class="muted">Konzeptentwurf · Beispieldaten</span></div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const lastView = { 'Nonuqu App': 'changes', 'Website Relaunch': 'history', 'Design System': 'browser' };
+    const branch = { 'Nonuqu App': 'trunk', 'Website Relaunch': 'branches/redesign', 'Design System': 'trunk' };
+    const titles = { overview: 'Übersicht', changes: 'Änderungen', history: 'Verlauf', browser: 'Repository-Browser' };
+    const descriptions = { overview: 'Dein Einstieg in dieses Projekt.', changes: 'Hier erscheinen lokale Änderungen der Arbeitskopie.', history: 'Hier erscheint der Verlauf des gewählten Repository-Pfads.', browser: 'Hier erkundest du das Repository.' };
+    let project = 'Nonuqu App';
+    function show(view) {
+      document.querySelector('#startView').hidden = view !== 'start';
+      document.querySelector('#projectView').hidden = view === 'start';
+      document.querySelector('#crumb').textContent = view === 'start' ? 'Alle Projekte' : `Projekte / ${project} / ${titles[view]}`;
+      document.querySelector('#switchButton').textContent = `${project} ▾`;
+      document.querySelector('#projectTitle').textContent = project;
+      document.querySelector('#branchButton').textContent = `${branch[project]} ▾`;
+      document.querySelector('#projectPath').textContent = `Aktive Arbeitskopie · Repository-Pfad: /${branch[project]}`;
+      if (view !== 'start') {
+        lastView[project] = view;
+        document.querySelector('#panelTitle').textContent = titles[view];
+        document.querySelector('#panelText').textContent = descriptions[view];
+      }
+      document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+      document.querySelector('#menu').classList.remove('open');
+      document.querySelector('#switchButton').setAttribute('aria-expanded', 'false');
+    }
+    document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => show(el.dataset.view)));
+    document.querySelectorAll('[data-project]').forEach(el => el.addEventListener('click', () => { project = el.dataset.project; show(lastView[project]); }));
+    document.querySelector('#switchButton').addEventListener('click', () => { const open = document.querySelector('#menu').classList.toggle('open'); document.querySelector('#switchButton').setAttribute('aria-expanded', String(open)); });
+    document.querySelector('#branchButton').addEventListener('click', () => alert('Entwurf: Branch/Pfad-Auswahl für die aktuelle Arbeitskopie'));
+    show('start');
+  </script>
+</body>
+</html>

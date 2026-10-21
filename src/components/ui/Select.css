@@ -1,0 +1,104 @@
+.svn-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  background: var(--nonu-bg-secondary);
+  color: var(--nonu-text);
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.svn-select-trigger:hover,
+.svn-select-trigger.is-open {
+  border-color: var(--nonu-primary);
+  background: var(--nonu-bg-hover);
+}
+
+.svn-select-trigger--filled {
+  background: var(--nonu-bg-tertiary);
+}
+.svn-select-trigger--filled:hover,
+.svn-select-trigger--filled.is-open {
+  background: var(--nonu-bg-tertiary);
+}
+
+.svn-select-trigger--small {
+  height: auto;
+  padding: 1px 4px;
+  font-size: var(--nonu-text-xs);
+  border-radius: 4px;
+}
+
+.svn-select-label {
+  flex: 1;
+}
+
+.svn-select-popup {
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 100%;
+}
+.svn-select-popup .svn-menu-item {
+  cursor: pointer;
+}
+
+.svn-menu--fullwidth {
+  width: 100%;
+}
+.svn-menu--fullwidth .svn-select-trigger {
+  width: 100%;
+  display: flex;
+  text-align: left;
+}
+.svn-menu--fullwidth .svn-select-popup {
+  width: 100%;
+}
+
+.svn-select-trigger > .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm);
+}
+.svn-select-trigger--small > .material-symbols-outlined {
+  font-size: var(--nonu-text-sm);
+}
+.svn-select-description {
+  display: block;
+  color: var(--nonu-text-muted);
+  font-size: var(--nonu-text-xs);
+  overflow-wrap: anywhere;
+}
+.svn-select-option--cursor {
+  background: var(--nonu-bg-hover, var(--nonu-bg-tertiary));
+}
+.svn-select-empty {
+  padding: 8px 12px;
+  color: var(--nonu-text-muted);
+}
+
+.svn-select-popup [role="listbox"] {
+  max-height: min(380px, 60vh);
+  overflow-y: auto;
+}
+.svn-select-popup [role="listbox"]:focus-visible {
+  outline: 2px solid var(--nonu-primary);
+  outline-offset: -2px;
+}
+.svn-select-popup .svn-menu-label {
+  min-width: 0;
+}
+
+.svn-select-more {
+  margin-left: auto;
+  padding: 2px;
+  border-radius: 4px;
+  font-size: 18px;
+  opacity: 0.6;
+}
+
+.svn-select-more:hover {
+  opacity: 1;
+  background: var(--nonu-bg-hover);
+}

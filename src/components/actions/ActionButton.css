@@ -1,0 +1,57 @@
+.svn-action-button {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--nonu-surface-2, var(--nonu-bg-hover));
+  color: var(--nonu-text);
+  border: 1px solid var(--nonu-border);
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 120ms,
+    border-color 120ms;
+}
+
+.svn-action-button:hover:not(:disabled) {
+  background: var(--nonu-bg-hover);
+  border-color: var(--nonu-primary);
+}
+
+.svn-action-button:focus-visible {
+  outline: 2px solid var(--nonu-primary);
+  outline-offset: 2px;
+}
+
+.svn-action-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.svn-action-button-icon {
+  grid-row: 1 / 3;
+  font-size: var(--nonu-icon-lg);
+  color: var(--nonu-primary);
+  align-self: center;
+}
+
+.svn-action-button-label {
+  font-size: var(--nonu-text-base);
+  font-weight: 600;
+  color: var(--nonu-text);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.svn-action-button-hint {
+  grid-column: 2;
+  font-size: var(--nonu-text-sm);
+  color: var(--nonu-text-muted);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}

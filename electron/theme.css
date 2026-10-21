@@ -1,0 +1,620 @@
+﻿/**
+ * Standalone Electron theme — maps the --nonu-* CSS variables used by
+ * panel.css to the standalone app's own theme palettes.
+ * Set data-theme="<id>" on <html> to switch; without it, prefers-color-scheme wins.
+ *
+ * Themes: dark, light, frozen-dark, olive, solarized-warm, milk-coffee, dark-coffee, dune, lotr, turtle-svn, matrix, matcha
+ */
+
+/* Material Symbols font (bundled alongside the app). Both names are used by
+   existing panel components; render them with the same local font. */
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/MaterialSymbolsRounded.ttf') format('truetype');
+}
+
+.material-symbols-outlined,
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* dark theme (default) */
+:root,
+[data-theme='dark'] {
+  --nonu-bg: #2e2d2d;
+  color-scheme: dark;
+  --nonu-bg-secondary: #1a1b1a;
+  --nonu-bg-tertiary: #3a3a3b;
+  --nonu-bg-hover: rgba(255, 255, 255, 0.05);
+  --nonu-text: #feffff;
+  --nonu-text-muted: #b3b4b3;
+  --nonu-text-faint: #808081;
+  --nonu-text-disabled: #676666;
+  --nonu-border: #4a4b4a;
+  --nonu-primary: #60a5f9;
+  --nonu-success: #4bde80;
+  --nonu-error: #ef4544;
+  --nonu-warning: #fbbf25;
+  --nonu-external: #b286f5;
+  --nonu-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #4b4a4a;
+  --nonu-scrollbar-hover: #5a5b5a;
+  /* Font-size scale */
+  --nonu-text-xs:   10px;  /* badges, timestamps, meta */
+  --nonu-text-sm:   11px;  /* standard UI rows & labels */
+  --nonu-text-md:   12px;  /* titlebar, dialog-body, secondary */
+  --nonu-text-base: 13px;  /* body text, log messages, inputs */
+  --nonu-text-lg:   15px;  /* section headings (h3) */
+  /* Icon scale (material-symbols) */
+  --nonu-icon-sm:   14px;  /* inline icons: chevrons, folder */
+  --nonu-icon-md:   16px;  /* standard row icons */
+  --nonu-icon-lg:   20px;  /* activity bar, brand */
+}
+
+/* light theme */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']):not([data-theme='frozen-dark']):not([data-theme='olive']):not([data-theme='solarized-warm']):not([data-theme='dark-coffee']):not([data-theme='milk-coffee']):not([data-theme='dune']):not([data-theme='lotr']):not([data-theme='turtle-svn']):not([data-theme='matrix']):not([data-theme='matcha']) {
+    --nonu-bg: #fffffe;
+    color-scheme: light;
+    --nonu-bg-secondary: #fafafb;
+    --nonu-bg-tertiary: #f3f5f6;
+    --nonu-bg-hover: rgba(0, 0, 0, 0.05);
+    --nonu-text: #111828;
+    --nonu-text-muted: #6c7280;
+    --nonu-text-faint: #9ca4af;
+    --nonu-text-disabled: #d1d5dc;
+    --nonu-border: #e6e7eb;
+    --nonu-primary: #3b83f6;
+    --nonu-success: #10b982;
+    --nonu-error: #f04444;
+    --nonu-warning: #f59f0b;
+    --nonu-external: #9f67e0;
+    --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+    --nonu-scrollbar: #d1d5dc;
+    --nonu-scrollbar-hover: #9da3af;
+    --nonu-text-xs: 10px; --nonu-text-sm: 11px; --nonu-text-md: 12px; --nonu-text-base: 13px; --nonu-text-lg: 15px;
+    --nonu-icon-sm: 14px; --nonu-icon-md: 16px; --nonu-icon-lg: 20px;
+  }
+}
+
+[data-theme='light'] {
+  --nonu-bg: #fffeff;
+  color-scheme: light;
+  --nonu-bg-secondary: #f9fafa;
+  --nonu-bg-tertiary: #f4f4f6;
+  --nonu-bg-hover: rgba(0, 0, 0, 0.05);
+  --nonu-text: #111927;
+  --nonu-text-muted: #6b7281;
+  --nonu-text-faint: #9da3af;
+  --nonu-text-disabled: #d1d6db;
+  --nonu-border: #e5e7ec;
+  --nonu-primary: #3c82f6;
+  --nonu-success: #10ba81;
+  --nonu-error: #ef4445;
+  --nonu-warning: #f69e0b;
+  --nonu-external: #9f67e0;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #d1d6db;
+  --nonu-scrollbar-hover: #9ca3b0;
+}
+
+/* Frozen Dark */
+[data-theme='frozen-dark'] {
+  --nonu-bg: #10172a;
+  color-scheme: dark;
+  --nonu-bg-secondary: #020717;
+  --nonu-bg-tertiary: #1e293c;
+  --nonu-bg-hover: rgba(255, 255, 255, 0.05);
+  --nonu-text: #f9fafc;
+  --nonu-text-muted: #cbd6e1;
+  --nonu-text-faint: #94a3b9;
+  --nonu-text-disabled: #65748b;
+  --nonu-border: #1e2a3b;
+  --nonu-primary: #38bdf9;
+  --nonu-success: #11b981;
+  --nonu-error: #ef4544;
+  --nonu-warning: #eab309;
+  --nonu-external: #b286f5;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #1f293b;
+  --nonu-scrollbar-hover: #334255;
+}
+
+/* Olive */
+[data-theme='olive'] {
+  --nonu-bg: #272823;
+  color-scheme: dark;
+  --nonu-bg-secondary: #1f1f1c;
+  --nonu-bg-tertiary: #3e3e32;
+  --nonu-bg-hover: rgba(255, 255, 255, 0.05);
+  --nonu-text: #f8f8f3;
+  --nonu-text-muted: #a7a6a0;
+  --nonu-text-faint: #75725e;
+  --nonu-text-disabled: #5a5a56;
+  --nonu-border: #3f3d32;
+  --nonu-primary: #a6e32e;
+  --nonu-success: #a6e22f;
+  --nonu-error: #fa2672;
+  --nonu-warning: #e6dc74;
+  --nonu-external: #ae81ff;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #3e3d33;
+  --nonu-scrollbar-hover: #4a483e;
+}
+
+/* Solarized Warm */
+[data-theme='solarized-warm'] {
+  --nonu-bg: #f5edd7;
+  color-scheme: light;
+  --nonu-bg-secondary: #eee5cc;
+  --nonu-bg-tertiary: #e0d9be;
+  --nonu-bg-hover: rgba(39, 40, 34, 0.06);
+  --nonu-bg-selected: rgba(166, 226, 46, 0.22);
+  --nonu-bg-active: #d4ccb5;
+  --nonu-text: #282822;
+  --nonu-text-muted: #49493e;
+  --nonu-text-faint: #75715f;
+  --nonu-text-disabled: #a99f8c;
+  --nonu-border: #cdc6aa;
+  --nonu-border-focus: #7aab1f;
+  --nonu-primary: #7bab1e;
+  --nonu-primary-hover: #6a9619;
+  --nonu-link: #268bd3;
+  --nonu-link-hover: #2ba198;
+  --nonu-success: #7aac1e;
+  --nonu-error: #f92673;
+  --nonu-warning: #b68900;
+  --nonu-info: #268cd2;
+  --nonu-external: #8559c2;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #cdc5ab;
+  --nonu-scrollbar-hover: #beb59a;
+}
+
+/* Milk Coffee */
+[data-theme='milk-coffee'] {
+  --nonu-bg: #f3ebdd;
+  color-scheme: light;
+  --nonu-bg-secondary: #e9dfce;
+  --nonu-bg-tertiary: #ddd1bd;
+  --nonu-bg-hover: rgba(39, 40, 34, 0.06);
+  --nonu-bg-selected: rgba(166, 226, 46, 0.22);
+  --nonu-bg-active: #d1c4ae;
+  --nonu-text: #2b2823;
+  --nonu-text-muted: #4d4639;
+  --nonu-text-faint: #7d7260;
+  --nonu-text-disabled: #b0a590;
+  --nonu-border: #d4c8b2;
+  --nonu-border-focus: #8a5a3b;
+  --nonu-primary: #8a5a3b;
+  --nonu-primary-hover: #744a2f;
+  --nonu-link: #2a7fa8;
+  --nonu-link-hover: #1f6688;
+  --nonu-success: #6f9a1a;
+  --nonu-error: #d11f63;
+  --nonu-warning: #a8801a;
+  --nonu-info: #2a7fa8;
+  --nonu-external: #7a5ba8;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #d4c8b2;
+  --nonu-scrollbar-hover: #c2b59d;
+}
+
+/* Dark Coffee */
+[data-theme='dark-coffee'] {
+  --nonu-bg: #28221d;
+  color-scheme: dark;
+  --nonu-bg-secondary: #1e1915;
+  --nonu-bg-tertiary: #362f28;
+  --nonu-bg-hover: rgba(245, 238, 220, 0.06);
+  --nonu-bg-selected: rgba(201, 139, 84, 0.16);
+  --nonu-bg-active: #423830;
+  --nonu-text: #f4ece1;
+  --nonu-text-muted: #b6a999;
+  --nonu-text-faint: #867a6a;
+  --nonu-text-disabled: #63584c;
+  --nonu-border: #40362e;
+  --nonu-border-focus: #c98b54;
+  --nonu-primary: #c98b54;
+  --nonu-primary-hover: #dca070;
+  --nonu-link: #66d9ef;
+  --nonu-link-hover: #8be4f4;
+  --nonu-success: #a6e22e;
+  --nonu-error: #f92672;
+  --nonu-warning: #e6db74;
+  --nonu-info: #66d9ef;
+  --nonu-external: #ae81ff;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #40362e;
+  --nonu-scrollbar-hover: #51453b;
+}
+
+/* Dune */
+[data-theme='dune'] {
+  --nonu-bg: #faf5e8;
+  color-scheme: light;
+  --nonu-bg-secondary: #f4eddb;
+  --nonu-bg-tertiary: #ece3cc;
+  --nonu-bg-hover: rgba(60, 64, 70, 0.07);
+  --nonu-bg-selected: rgba(120, 152, 176, 0.25);
+  --nonu-bg-active: #e2d8bd;
+  --nonu-text: #33363a;
+  --nonu-text-muted: #575b60;
+  --nonu-text-faint: #7d7f80;
+  --nonu-text-disabled: #bdb8a8;
+  --nonu-border: #e2d8bd;
+  --nonu-border-focus: #6f8fa8;
+  --nonu-primary: #6f8fa8;
+  --nonu-primary-hover: #5b7d97;
+  --nonu-link: #4f7391;
+  --nonu-link-hover: #3c5f7c;
+  --nonu-success: #7d8f5a;
+  --nonu-error: #b5503f;
+  --nonu-warning: #b8863a;
+  --nonu-info: #6f8fa8;
+  --nonu-external: #8a6fa8;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #e2d8bd;
+  --nonu-scrollbar-hover: #cfc4a6;
+}
+
+/* The Fellowship */
+[data-theme='lotr'] {
+  --nonu-bg: #1e2a20;
+  color-scheme: dark;
+  --nonu-bg-secondary: #16201a;
+  --nonu-bg-tertiary: #2a382c;
+  --nonu-bg-hover: rgba(225, 235, 200, 0.06);
+  --nonu-bg-selected: rgba(201, 164, 76, 0.20);
+  --nonu-bg-active: #344537;
+  --nonu-text: #ebe4cc;
+  --nonu-text-muted: #a9b296;
+  --nonu-text-faint: #7a8670;
+  --nonu-text-disabled: #586354;
+  --nonu-border: #364839;
+  --nonu-border-focus: #c9a44c;
+  --nonu-primary: #c9a44c;
+  --nonu-primary-hover: #dbb862;
+  --nonu-link: #8fbf8a;
+  --nonu-link-hover: #a8d2a3;
+  --nonu-success: #7fb069;
+  --nonu-error: #c4553f;
+  --nonu-warning: #d9a441;
+  --nonu-info: #7fa8b8;
+  --nonu-external: #b2904c;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #364839;
+  --nonu-scrollbar-hover: #465c49;
+}
+
+/* Turtle SVN */
+[data-theme='turtle-svn'] {
+  --nonu-bg: #ffffff;
+  color-scheme: light;
+  --nonu-bg-secondary: #f0f0f0;
+  --nonu-bg-tertiary: #e1e1e1;
+  --nonu-bg-hover: rgba(51, 153, 255, 0.12);
+  --nonu-bg-selected: #3399ff;
+  --nonu-bg-active: #cce8ff;
+  --nonu-text: #000000;
+  --nonu-text-muted: #3c3c3c;
+  --nonu-text-faint: #6d6d6d;
+  --nonu-text-disabled: #a0a0a0;
+  --nonu-border: #a0a0a0;
+  --nonu-border-focus: #0078d7;
+  --nonu-primary: #0078d7;
+  --nonu-primary-hover: #005a9e;
+  --nonu-link: #0000ee;
+  --nonu-link-hover: #551a8b;
+  --nonu-success: #008000;
+  --nonu-error: #cc0000;
+  --nonu-warning: #d98c00;
+  --nonu-info: #0078d7;
+  --nonu-external: #744da9;
+  --nonu-font-mono: 'Consolas', 'Courier New', monospace;
+  --nonu-scrollbar: #c1c1c1;
+  --nonu-scrollbar-hover: #a8a8a8;
+}
+
+/* Digital Rain */
+[data-theme='matrix'] {
+  --nonu-bg: #030a05;
+  color-scheme: dark;
+  --nonu-bg-secondary: #010603;
+  --nonu-bg-tertiary: #0a1f10;
+  --nonu-bg-hover: rgba(0, 255, 65, 0.06);
+  --nonu-bg-selected: rgba(0, 255, 65, 0.18);
+  --nonu-bg-active: #12301a;
+  --nonu-text: #c8ffd6;
+  --nonu-text-muted: #6fbf86;
+  --nonu-text-faint: #3f7a52;
+  --nonu-text-disabled: #2a4f36;
+  --nonu-border: #123a20;
+  --nonu-border-focus: #00ff41;
+  --nonu-primary: #00ff41;
+  --nonu-primary-hover: #5dff85;
+  --nonu-link: #00d4aa;
+  --nonu-link-hover: #5ff0cf;
+  --nonu-success: #2fd46a;
+  --nonu-error: #ff4d4d;
+  --nonu-warning: #c6e62b;
+  --nonu-info: #00c2a8;
+  --nonu-external: #00e5ff;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #123a20;
+  --nonu-scrollbar-hover: #1d5230;
+}
+
+/* Matcha */
+[data-theme='matcha'] {
+  --nonu-bg: #f3f6ec;
+  color-scheme: light;
+  --nonu-bg-secondary: #e9efdd;
+  --nonu-bg-tertiary: #dde6cc;
+  --nonu-bg-hover: rgba(40, 60, 30, 0.06);
+  --nonu-bg-selected: rgba(63, 122, 74, 0.16);
+  --nonu-bg-active: #d0dcba;
+  --nonu-text: #1f2a1c;
+  --nonu-text-muted: #4a5a43;
+  --nonu-text-faint: #77876f;
+  --nonu-text-disabled: #b9c5ab;
+  --nonu-border: #cfdbbd;
+  --nonu-border-focus: #3f7a4a;
+  --nonu-primary: #3f7a4a;
+  --nonu-primary-hover: #2f6039;
+  --nonu-link: #b0642f;
+  --nonu-link-hover: #8f4e22;
+  --nonu-success: #3f8f4f;
+  --nonu-error: #b3262f;
+  --nonu-warning: #c98a1b;
+  --nonu-info: #2f7d8c;
+  --nonu-external: #7a4f8c;
+  --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
+  --nonu-scrollbar: #cfdbbd;
+  --nonu-scrollbar-hover: #b4c29c;
+}
+
+/* base reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--nonu-bg);
+  color: var(--nonu-text);
+  font-family: var(--nonu-font-ui);
+  font-size: var(--nonu-text-base);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--nonu-scrollbar);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nonu-scrollbar-hover);
+}
+
+/* folder picker */
+.svn-standalone-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  padding: 32px;
+  background: var(--nonu-bg);
+  color: var(--nonu-text);
+}
+
+.svn-standalone-picker h2 {
+  margin: 0;
+  font-size: var(--nonu-icon-lg); /* large heading matches icon-lg scale */
+  font-weight: 600;
+  color: var(--nonu-text);
+}
+.svn-standalone-logo {
+  width: 128px;
+  height: 128px;
+  margin-bottom: 14px;
+  display: block;
+  color: var(--nonu-accent, var(--nonu-text));
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 12;
+  stroke-linecap: round;
+  filter: drop-shadow(0 10px 24px color-mix(in srgb, var(--nonu-accent, #7c9cff) 24%, transparent));
+}
+
+.svn-standalone-recent-label {
+  margin: 8px 0 4px;
+  font-size: var(--nonu-text-sm);
+  text-transform: uppercase;
+  color: var(--nonu-text-muted);
+  letter-spacing: 0.08em;
+}
+
+.svn-standalone-recent {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 560px;
+}
+
+.svn-standalone-recent-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--nonu-bg-secondary);
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  color: var(--nonu-text);
+  font-size: var(--nonu-text-base);
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: background 0.15s;
+}
+
+.svn-standalone-recent-item:hover {
+  background: var(--nonu-bg-tertiary);
+}
+
+.svn-btn-primary {
+  background: var(--nonu-primary) !important;
+  color: #fff !important;
+  border-color: var(--nonu-primary) !important;
+  font-weight: 600;
+}
+
+.svn-btn-primary:hover {
+  filter: brightness(1.15);
+}
+
+/* SVN-missing warning banner */
+.svn-missing-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--nonu-warning) 15%, var(--nonu-bg-secondary));
+  border: 1px solid var(--nonu-warning);
+  border-radius: 4px;
+  color: var(--nonu-text);
+  font-size: var(--nonu-text-md);
+  margin: 8px;
+}
+
+/* shell / path bar / checkout form */
+.svn-standalone-shell { display: flex; flex-direction: column; height: 100%; }
+.svn-standalone-home-shell { display: flex; flex: 1; min-height: 0; min-width: 0; }
+.svn-standalone-home-content { display: flex; flex: 1; min-height: 0; min-width: 0; }
+.svn-standalone-home-content[hidden] { display: none; }
+.svn-standalone-main { flex: 1; min-height: 0; }
+.svn-standalone-pathbar {
+  display: flex; align-items: center; gap: 8px; padding: 4px 8px;
+  background: var(--nonu-bg-secondary); border-bottom: 1px solid var(--nonu-border);
+  color: var(--nonu-text-muted); font-size: var(--nonu-text-md);
+}
+.svn-standalone-path { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
+.svn-standalone-row { display: flex; gap: 8px; align-items: center; }
+.svn-standalone-row > input { flex: 1; }
+.svn-standalone-form { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 560px; }
+.svn-standalone-form h3 { margin: 0; font-size: var(--nonu-text-lg); }
+.svn-standalone-form input {
+  padding: 6px 8px; background: var(--nonu-bg-secondary); color: var(--nonu-text);
+  border: 1px solid var(--nonu-border); border-radius: 4px; font-size: var(--nonu-text-base);
+}
+.svn-standalone-error { margin: 0; max-height: 140px; overflow: auto; font-size: var(--nonu-text-md); color: var(--nonu-error, #e55); white-space: pre-wrap; }
+
+/* custom title bar (native frame hidden, OS draws only window buttons) */
+.svn-titlebar {
+  flex: none; height: 36px; display: flex; align-items: center; gap: 8px;
+  padding: 0 140px 0 12px; /* right gap = native min/max/close overlay */
+  background: var(--nonu-bg-secondary); color: var(--nonu-text-muted);
+  border-bottom: 1px solid var(--nonu-border); font-size: var(--nonu-text-md);
+  -webkit-app-region: drag; user-select: none;
+}
+.svn-titlebar-app-icon { flex: none; width: 16px; height: 16px; color: var(--nonu-text); overflow: visible; }
+.svn-titlebar-icon { flex: none; color: var(--nonu-primary); }
+.svn-titlebar-title { font-weight: 600; color: var(--nonu-text); }
+.svn-menubar { display: flex; margin-left: 8px; -webkit-app-region: no-drag; }
+.svn-menu { position: relative; }
+.svn-menu-popup {
+  position: absolute; top: 28px; left: 0; z-index: 1000; min-width: 220px; padding: 4px;
+  background: var(--nonu-bg-tertiary); border: 1px solid var(--nonu-border); border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.svn-menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 8px; border: 0;
+  border-radius: 4px; background: transparent; color: var(--nonu-text); font: inherit; text-align: left; cursor: pointer;
+}
+.svn-menu-item:hover { background: var(--nonu-bg-hover); }
+.svn-menu-check { width: 14px; color: var(--nonu-primary); }
+.svn-menu-label { flex: 1; }
+.svn-menu-hint { color: var(--nonu-text-faint); font-size: var(--nonu-text-sm); }
+.svn-menu-sep { height: 1px; margin: 4px 6px; background: var(--nonu-border); }
+#root { display: flex; flex-direction: column; }
+.svn-standalone-picker { flex: 1; min-height: 0; height: auto; }
+
+.svn-titlebar-ws {
+  flex: none; min-width: 0; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px;
+  background: var(--nonu-bg-secondary); color: var(--nonu-text-muted); border-bottom: 1px solid var(--nonu-border);
+  font-size: var(--nonu-text-md);
+}
+.svn-titlebar-btn, .svn-titlebar-icon-btn { -webkit-app-region: no-drag; flex: none; }
+.svn-titlebar-btn { height: 24px; padding: 0 10px; }
+.svn-titlebar-btn--uptodate, .svn-btn.svn-titlebar-btn--uptodate:disabled {
+  background: transparent; border: 1px solid var(--nonu-success); color: var(--nonu-success); opacity: 1;
+}
+.svn-titlebar-reponame {
+  flex: none; color: var(--nonu-primary); font-family: var(--nonu-font-mono); font-weight: 600;
+}
+.svn-titlebar-rev { flex: none; font-family: var(--nonu-font-mono); color: var(--nonu-text-faint); }
+.svn-titlebar-path {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  direction: rtl; text-align: left; color: var(--nonu-text-faint);
+}
+.svn-titlebar-icon-btn {
+  display: flex; align-items: center; justify-content: center; width: 26px; height: 24px; border: 0;
+  border-radius: 4px; background: transparent; color: var(--nonu-text-muted); cursor: default;
+}
+.svn-titlebar-icon-btn:hover:not(:disabled) { background: var(--nonu-bg-hover); color: var(--nonu-text); }
+.svn-titlebar-icon-btn:disabled { opacity: 0.5; }
+
+.svn-titlebar-projectname {
+  flex: none; height: 24px; padding: 0 6px; border: 0; border-radius: 4px; background: transparent;
+  color: var(--nonu-text); font: inherit; font-weight: 600; cursor: default; -webkit-app-region: no-drag;
+}
+.svn-titlebar-projectname:hover { background: var(--nonu-bg-hover); }
+.svn-switcher-anchor { position: relative; display: flex; align-items: center; gap: 2px; -webkit-app-region: no-drag; }
+.svn-titlebar-branch-select { -webkit-app-region: no-drag; }
+.svn-titlebar-branch-select .svn-select-trigger {
+  border: 0; background: transparent; color: var(--nonu-text-muted); height: 24px; padding: 0 8px; gap: 2px;
+}
+.svn-titlebar-branch-select .svn-select-trigger:hover,
+.svn-titlebar-branch-select .svn-select-trigger.is-open { background: var(--nonu-bg-hover); color: var(--nonu-text); border-color: transparent; }
+.svn-titlebar-branch-select .svn-select-popup { min-width: 200px; max-height: 320px; overflow-y: auto; }
+
+/* terminal body */
+.svn-terminal { background: var(--nonu-bg-secondary); }
+.svn-terminal-head { background: var(--nonu-bg-secondary); border-top: 1px solid var(--nonu-border); }
+.svn-terminal-body {
+  background: var(--nonu-bg-secondary);
+  font-family: var(--nonu-font-mono);
+  font-size: var(--nonu-text-md);
+  line-height: 1.6;
+}
+.svn-terminal-empty { background: var(--nonu-bg-secondary); }

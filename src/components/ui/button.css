@@ -1,0 +1,231 @@
+/* Base */
+.svn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text);
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  padding: 3px 9px;
+  font: inherit;
+  font-size: var(--nonu-text-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.svn-btn:hover:not(:disabled) {
+  border-color: var(--nonu-primary);
+}
+
+.svn-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.svn-btn .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm);
+  line-height: 1;
+}
+
+/* Size: sm */
+/* Used for bulk-toolbar buttons and conflict buttons */
+.svn-btn--sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.svn-btn--sm .material-symbols-outlined {
+  font-size: var(--nonu-text-md);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Variant: primary */
+.svn-btn--primary {
+  background: var(--nonu-primary);
+  border-color: var(--nonu-primary);
+  color: var(--nonu-on-primary);
+  font-weight: 600;
+}
+
+/* Disabled primary: fall back to the default button look so it reads as inactive */
+.svn-btn--primary:disabled {
+  background: var(--nonu-bg-tertiary);
+  border-color: var(--nonu-border);
+  color: var(--nonu-text-muted);
+  opacity: 1;
+}
+
+/* Variant: danger */
+.svn-btn--danger {
+  background: transparent;
+  color: var(--nonu-text-muted);
+}
+
+.svn-btn--danger:hover:not(:disabled) {
+  border-color: var(--nonu-error, var(--nonu-danger, #e05));
+  color: var(--nonu-error, var(--nonu-danger, #e05));
+}
+
+/* Variant: ghost */
+/* Row-level action buttons (open, revert, diff icons) */
+.svn-btn--ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--nonu-text-muted);
+  padding: 2px;
+}
+
+.svn-btn--ghost:hover:not(:disabled) {
+  color: var(--nonu-primary);
+  background: var(--nonu-bg-tertiary);
+  border-color: transparent;
+}
+
+.svn-btn--ghost .material-symbols-outlined {
+  font-size: var(--nonu-text-lg);
+}
+
+/* Variant: mode */
+/* Toolbar toggle buttons (unified/split diff, prev/next change) */
+.svn-btn--mode {
+  background: transparent;
+  border: 0;
+  color: var(--nonu-text-muted);
+  padding: 0 8px;
+  font-size: var(--nonu-text-md);
+  line-height: 20px;
+}
+
+.svn-btn--mode:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--nonu-text) 8%, transparent);
+  border-color: transparent;
+}
+
+.svn-btn--mode.svn-btn--active {
+  background: color-mix(in srgb, var(--nonu-primary) 20%, transparent);
+  color: var(--nonu-text);
+}
+
+.svn-btn--mode .material-symbols-outlined {
+  font-size: var(--nonu-icon-md);
+  vertical-align: middle;
+}
+
+/* Edit toolbar modifier (adds border to mode buttons inside editor) */
+.svn-edit-btn {
+  border: 1px solid var(--nonu-border) !important;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+/* Icon-only layout */
+.svn-btn--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.svn-btn--icon .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm);
+}
+
+/* Icon-only: square */
+.svn-btn--square {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+.svn-btn--ghost.svn-btn--active {
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text);
+}
+
+/* Conflict button alias (used imperatively in conflicts.ts) */
+/* svn-conflict-btn is set via className in plain DOM — keep it as an alias */
+.svn-conflict-btn {
+  --btn-bg: var(--nonu-bg-tertiary, var(--nonu-bg));
+  --btn-bg-hover: var(--nonu-bg-hover, var(--nonu-bg-active));
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background-color: var(--btn-bg);
+  color: var(--nonu-text);
+  border: 1px solid var(--nonu-border);
+  border-radius: 4px;
+  padding: 1px 8px;
+  font: inherit;
+  font-size: var(--nonu-text-sm);
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.svn-conflict-btn:hover {
+  --btn-bg: var(--btn-bg-hover);
+  background-color: var(--btn-bg-hover);
+}
+
+/* Split button */
+.svn-split-btn {
+  display: inline-flex;
+  align-items: stretch;
+  margin-right: 6px;
+}
+
+.svn-split-btn > .svn-btn.svn-split-btn__primary {
+  margin-right: 0;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+}
+
+.svn-split-btn__chevron {
+  border-radius: 0 4px 4px 0 !important;
+  padding: 0 4px !important;
+  border-left: 1px solid color-mix(in srgb, var(--nonu-border) 60%, transparent) !important;
+}
+
+.svn-split-btn__menu {
+  top: calc(100% + 3px);
+  left: 0;
+}
+
+.svn-split-btn__item {
+  /* Kept as a semantic hook for consumers that target split-button items. */
+}
+
+/* Scan button (spinner + progress bar) */
+.svn-btn--scan {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.svn-btn--scan .svn-btn-scan__label {
+  white-space: nowrap;
+}
+
+.svn-btn--scan-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 60%;
+  height: 2px;
+  background: var(--nonu-primary, #4a9eff);
+  border-radius: 1px;
+  animation: svn-scan-progress 1.5s ease-in-out infinite;
+}

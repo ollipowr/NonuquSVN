@@ -1,0 +1,6 @@
+.svn-text-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: var(--nonu-text-sm);
+}
