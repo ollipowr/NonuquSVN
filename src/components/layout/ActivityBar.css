@@ -233,4 +233,5 @@
 }
 .svn-ab--collapsed .svn-ab-sep {
   width: 24px;
+  align-self: center;
 }
