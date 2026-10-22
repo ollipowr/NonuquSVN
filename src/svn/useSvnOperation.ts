@@ -12,6 +12,8 @@ import {
 export type OperationNotice = {
   kind: 'info' | 'success' | 'error';
   text: string;
+  /** Second line shown under the title in the toast (e.g. the revision). */
+  subtitle?: string;
   command?: string;
   stderr?: string;
 } | null;
@@ -22,6 +24,13 @@ type PendingOp = {
   fn: (credentials?: SvnCredentials, log?: OperationLog) => Promise<string>;
   refresh: boolean;
 };
+/** First line is the toast title, the rest (if any) is the subtitle. */
+function splitNotice(out: string): { text: string; subtitle?: string } {
+  const newline = out.indexOf('\n');
+  if (newline === -1) return { text: out };
+  return { text: out.slice(0, newline), subtitle: out.slice(newline + 1) };
+}
+
 export function toOperationNotice(err: unknown): OperationNotice {
   if (err instanceof SvnError)
     return {
@@ -61,7 +70,7 @@ export function useSvnOperation({
       try {
         const out = await fn(undefined, appendLog);
         const text = out || `${label} done.`;
-        setPill({ kind: 'success', text });
+        setPill({ kind: 'success', ...splitNotice(text) });
         appendLog({ kind: 'success', text, ts: Date.now() });
       } catch (err) {
         if (err instanceof SvnError && isAuthError(err)) {

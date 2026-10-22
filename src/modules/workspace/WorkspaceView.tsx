@@ -11,6 +11,7 @@ import {
   Dialog,
   type LogEntry,
   Splitter,
+  Toast,
   useListSelection,
   ViewHeader,
 } from '@nonu/components';
@@ -68,7 +69,6 @@ import {
 } from '@nonu/stores';
 import {
   commandTooLong,
-  expandUnversionedFolders,
   findDirectories,
   type OperationNotice as Pill,
   runSvn,
@@ -91,6 +91,7 @@ import {
   appendOutput,
   setOutputBusy,
   setOutputCollapsed,
+  setOutputVisible,
 } from '@nonu/stores/outputLog';
 import React, {
   useCallback,
@@ -101,6 +102,7 @@ import React, {
 } from 'react';
 import { mergeRegistryForWorkspace } from './mergeWorkspace.js';
 import { buildNavViews } from './navViews.js';
+import { isListed } from './statusBadges.js';
 
 import {
   checkWorkspaceRemote,
@@ -135,7 +137,6 @@ export interface WorkspaceChrome {
   branches: { id: string; name: string; isCurrent: boolean }[];
   /** Switches the working copy to another workspace's localPath. No-op for remote-only entries or the current one. */
   onSwitchBranch: (id: string) => void;
-  openHome?: () => void;
   openWorkingCopy?: () => void;
   projectLevel?: boolean;
   guard?: (proceed: () => void) => void;
@@ -158,7 +159,6 @@ export function WorkspaceView({
   initialView = 'changes',
   shellViewRequest,
   onViewChange,
-  onHome,
 }: {
   host: HostAdapter;
   /** Host renders update/revision/settings itself; skip the built-in toolbar. */
@@ -169,8 +169,6 @@ export function WorkspaceView({
   initialView?: WorkspaceViewId;
   shellViewRequest?: { view: WorkspaceViewId; mergeMessage?: string };
   onViewChange?: (view: WorkspaceViewId) => void;
-  /** Goes to the start page (rail item "Start"). */
-  onHome?: () => void;
 }) {
   const cwd = host.workspacePath;
   const workspaceStatus = useWorkspaceStatus(cwd);
@@ -295,8 +293,6 @@ export function WorkspaceView({
     },
     [activeView, onViewChange],
   );
-  const homeRef = useRef(onHome);
-  homeRef.current = onHome;
   const navigateRef = useRef(setActiveView);
   navigateRef.current = setActiveView;
   const [projectStore, setProjectStore] = useState(() =>
@@ -406,8 +402,8 @@ export function WorkspaceView({
   useEffect(() => {
     if (workspaceStatus) {
       setChanges(
-        workspaceStatus.changes.filter(
-          (change) => showIgnoredRef.current || change.status !== 'ignored',
+        workspaceStatus.changes.filter((change) =>
+          isListed(change, showIgnoredRef.current),
         ),
       );
     }
@@ -571,8 +567,8 @@ export function WorkspaceView({
           // BASE can move outside Nonuqu (other clients, svn CLI); refresh re-reads it.
           clearEditableFileCache();
           const info = workspace.repo;
-          const parsed = workspace.changes.filter(
-            (change) => showIgnoredRef.current || change.status !== 'ignored',
+          const parsed = workspace.changes.filter((change) =>
+            isListed(change, showIgnoredRef.current),
           );
           // svn info lags until svn update: pin the revision we just committed so the toolbar stays correct.
           const pinnedRev = committedRevRef.current;
@@ -638,47 +634,6 @@ export function WorkspaceView({
               : null,
           );
           setRefreshTick((t) => t + 1);
-
-          // Folder expansion can be slow on big build trees: merge its result only while this status is still current.
-          void expandUnversionedFolders(parsed, cwd, host.exec.bind(host)).then(
-            (expanded) => {
-              if (refreshGeneration.current !== generation) return;
-              setChanges((current) => {
-                const activePath = activeRef.current;
-                const edited = current.find(
-                  (change) => change.path === activePath,
-                );
-                return dirtyRef.current &&
-                  edited &&
-                  !expanded.some((change) => change.path === edited.path)
-                  ? [...expanded, edited]
-                  : expanded;
-              });
-              setSelected((prev) => {
-                const next = new Set(prev);
-                for (const change of expanded) {
-                  if (
-                    !parsedPaths.has(change.path) &&
-                    (first
-                      ? isPreselected(
-                          change,
-                          settingsRef.current.defaultSelection,
-                        )
-                      : change.committable)
-                  )
-                    next.add(change.path);
-                }
-                return next;
-              });
-              setActive((prev) =>
-                prev &&
-                (dirtyRef.current || expanded.some((c) => c.path === prev))
-                  ? prev
-                  : null,
-              );
-              setRefreshTick((t) => t + 1);
-            },
-          );
         } catch (err) {
           setPill(toPill(err));
         } finally {
@@ -846,6 +801,7 @@ export function WorkspaceView({
 
   const {
     filteredAndSorted,
+    filteredPaths,
     folderGroups,
     visiblePaths,
     allSelected,
@@ -1145,12 +1101,18 @@ export function WorkspaceView({
     clearEditableFileCache();
     committedRevRef.current = null; // WC revision is now authoritative again
     justCommittedRef.current = false;
-    void run(t('opUpdate') as string, async (credentials) => {
+    void run(t('opUpdate') as string, async (credentials, log) => {
       const { stdout } = await runSvn(['update'], cwd, credentials);
+      const trimmed = stdout.trim();
+      // Full per-file output goes to the log; the pill only needs the final summary line.
+      if (trimmed) log?.({ kind: 'info', text: trimmed, ts: Date.now() });
       // svn update brings the WC to HEAD, so the button can disable without a remote re-check.
       setUpdateAvailable(false);
       lastRemoteCheck.current = Date.now();
-      return stdout.trim() || (t('opUpdateDone') as string);
+      const revisionLine = /^At revision \d+\.$/m.exec(trimmed)?.[0];
+      return revisionLine
+        ? `${t('opUpdateDone') as string}\n${revisionLine}`
+        : (t('opUpdateDone') as string);
     });
   };
 
@@ -1192,7 +1154,6 @@ export function WorkspaceView({
       project: activeProject ? { name: activeProject.name } : undefined,
       branches: chromeBranches(registry, cwd),
       onSwitchBranch: (id: string) => onSwitchBranchRef.current(id),
-      openHome: () => homeRef.current?.(),
       openWorkingCopy: () => navigateRef.current('changes'),
       projectLevel: ['repo', 'projectLogs'].includes(activeView),
     });
@@ -1372,10 +1333,6 @@ export function WorkspaceView({
         active={activeView}
         noneActive={showSettings}
         onChange={(id) => {
-          if (id === 'start') {
-            onHome?.();
-            return;
-          }
           if (showSettings) closeSettings();
           setActiveView(id);
         }}
@@ -1407,7 +1364,6 @@ export function WorkspaceView({
         ]}
         views={buildNavViews({
           hasWorkspace: true,
-          activeView,
           changesCount: changes.length,
         })}
       />
@@ -1449,7 +1405,7 @@ export function WorkspaceView({
               allSelected={allSelected}
               onToggleAll={() =>
                 setSelected(
-                  selected.size > 0 ? new Set() : new Set(visiblePaths),
+                  selected.size > 0 ? new Set() : new Set(filteredPaths),
                 )
               }
               toolbar={{
@@ -1775,6 +1731,11 @@ export function WorkspaceView({
         )}
 
         <OutputDock storage={host.storage} />
+        <Toast
+          notice={pill}
+          onDismiss={() => setPill(null)}
+          onErrorClick={() => setOutputVisible(true)}
+        />
       </div>
     </div>
   );

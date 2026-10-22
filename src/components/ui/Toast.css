@@ -1,0 +1,80 @@
+.svn-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: var(--nonu-text-sm);
+  font-family: var(--nonu-font-mono, monospace);
+  border: 1px solid
+    color-mix(in srgb, var(--nonu-primary) 45%, var(--nonu-border));
+  background: var(--nonu-bg-tertiary);
+  box-shadow: 0 8px 32px color-mix(in srgb, black 40%, transparent);
+  animation: svn-toast-in 150ms ease-out;
+}
+
+.svn-toast-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.svn-toast-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.svn-toast-subtitle {
+  color: var(--nonu-text-muted);
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow: auto;
+}
+
+@keyframes svn-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.svn-toast--success {
+  border-color: color-mix(in srgb, var(--nonu-success) 50%, var(--nonu-border));
+  color: var(--nonu-success);
+}
+
+.svn-toast--error {
+  border-color: color-mix(in srgb, var(--nonu-error) 55%, var(--nonu-border));
+  color: var(--nonu-error);
+}
+
+.svn-toast--clickable {
+  cursor: pointer;
+}
+
+.svn-toast-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.svn-toast-close .material-symbols-outlined {
+  font-size: var(--nonu-icon-sm, 16px);
+}

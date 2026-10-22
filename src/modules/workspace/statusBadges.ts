@@ -1,11 +1,11 @@
 import type { SvnChange } from '@nonu/svn';
 
-/** Changes a user would see in the list: ignored and external entries are bookkeeping. */
-const shown = (c: SvnChange) =>
-  c.status !== 'ignored' && c.status !== 'external';
+/** Single rule for the change list and every count: externals are never pending changes, ignored only when shown. */
+export const isListed = (c: SvnChange, showIgnored: boolean) =>
+  c.status !== 'external' && (showIgnored || c.status !== 'ignored');
 
 export const changeCount = (changes: SvnChange[]): number =>
-  changes.filter(shown).length;
+  changes.filter((c) => isListed(c, false)).length;
 
 export const conflictCount = (changes: SvnChange[]): number =>
   changes.filter((c) => c.status === 'conflicted').length;
