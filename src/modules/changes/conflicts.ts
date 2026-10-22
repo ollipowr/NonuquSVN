@@ -20,6 +20,7 @@ import {
 } from '@codemirror/view';
 import { t } from '@nonu/app/i18n';
 import { highlightLine } from '@nonu/utils';
+import { wordDiff } from './diffHunks.js';
 
 export interface ConflictBlock {
   /** Line of `<<<<<<<`. */
@@ -146,35 +147,6 @@ function resolveChange(doc: EditorState['doc'], b: ConflictBlock, c: Choice) {
 /** diff3 base section with at least one real line (an empty base is not worth showing). */
 const hasBaseContent = (b: ConflictBlock) =>
   b.base >= 0 && b.sep - b.base - 1 > 0;
-
-const isWord = (ch: string | undefined) => !!ch && /\w/.test(ch);
-
-/** Offsets (within the joined texts) of the differing middle part, snapped to word boundaries. */
-function wordDiff(
-  a: string,
-  b: string,
-): { a: [number, number]; b: [number, number] } | null {
-  let p = 0;
-  while (p < a.length && p < b.length && a[p] === b[p]) p++;
-  while (p > 0 && isWord(a[p - 1]) && (isWord(a[p]) || isWord(b[p]))) p--;
-  let s = 0;
-  while (
-    s < a.length - p &&
-    s < b.length - p &&
-    a[a.length - 1 - s] === b[b.length - 1 - s]
-  )
-    s++;
-  while (
-    s > 0 &&
-    isWord(a[a.length - s]) &&
-    (isWord(a[a.length - s - 1]) || isWord(b[b.length - s - 1]))
-  )
-    s--;
-  const ra: [number, number] = [p, a.length - s];
-  const rb: [number, number] = [p, b.length - s];
-  if (ra[0] >= ra[1] && rb[0] >= rb[1]) return null;
-  return { a: ra, b: rb };
-}
 
 class BlockWidget extends WidgetType {
   constructor(
@@ -327,7 +299,12 @@ const escapeHtml = (t: string) =>
   t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** Wraps the text between character offsets [from, to) of `root` in `<span class=cls>`, keeping inner markup (syntax colors). */
-function wrapRange(root: HTMLElement, from: number, to: number, cls: string) {
+export function wrapRange(
+  root: HTMLElement,
+  from: number,
+  to: number,
+  cls: string,
+) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const hits: [Text, number, number][] = [];
   let pos = 0;

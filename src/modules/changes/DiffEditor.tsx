@@ -50,6 +50,7 @@ import {
   conflictExtension,
   conflictPositions,
   hasConflictMarkers,
+  wrapRange,
 } from './conflicts.js';
 
 import { computeHunks, type Hunk, splitLines } from './diffHunks.js';
@@ -130,6 +131,7 @@ class RowWidget extends WidgetType {
     readonly cls: string,
     readonly lang: string | null,
     readonly hunkIndex: number,
+    readonly marks?: [number, number],
   ) {
     super();
   }
@@ -139,15 +141,19 @@ class RowWidget extends WidgetType {
       o.text === this.text &&
       o.cls === this.cls &&
       o.oldNo === this.oldNo &&
-      o.hunkIndex === this.hunkIndex
+      o.hunkIndex === this.hunkIndex &&
+      o.marks?.join() === this.marks?.join()
     );
   }
   toDOM() {
     const el = document.createElement('div');
     el.className = `svn-cm-row ${this.kind === 'del' ? 'svn-diff-del' : 'svn-split-empty'} ${this.cls}`;
     el.dataset.diffHunk = String(this.hunkIndex);
-    if (this.kind === 'del')
+    if (this.kind === 'del') {
       el.innerHTML = highlightLine(this.text, this.lang) || ' ';
+      if (this.marks)
+        wrapRange(el, this.marks[0], this.marks[1], 'svn-diff-word-del');
+    }
     return el;
   }
   ignoreEvent() {
@@ -227,16 +233,23 @@ function buildState(
     idx < doc.lines
       ? { pos: doc.line(idx + 1).from, side: -1 }
       : { pos: doc.length, side: 1 };
+  const wordCls =
+    mode === 'split-left' ? 'svn-diff-word-del' : 'svn-diff-word-add';
   hunks.forEach((h, hi) => {
     const f = focus === hi ? ' svn-change-focus' : '';
     // Rows in visual order, each tagged so first/last get the frame edges.
     type Row = {
       line?: number;
+      marks?: [number, number];
       widget?: RowWidget;
       at?: { pos: number; side: number };
     };
     const rows: Row[] = [];
-    const widget = (kind: 'del' | 'spacer', oi: number) =>
+    const widget = (
+      kind: 'del' | 'spacer',
+      oi: number,
+      marks?: [number, number],
+    ) =>
       new RowWidget(
         kind,
         kind === 'del' ? (oldL[oi] ?? '') : '',
@@ -244,17 +257,24 @@ function buildState(
         '',
         lang,
         hi,
+        marks,
       );
     if (mode === 'inline') {
       for (let k = 0; k < h.del; k++)
-        rows.push({ widget: widget('del', h.o + k), at: lineStart(h.n) });
-      for (let k = 0; k < h.add; k++) rows.push({ line: h.n + k + 1 });
+        rows.push({
+          widget: widget('del', h.o + k, h.words[k]?.a),
+          at: lineStart(h.n),
+        });
+      for (let k = 0; k < h.add; k++)
+        rows.push({ line: h.n + k + 1, marks: h.words[k]?.b ?? undefined });
     } else if (mode === 'split-right') {
-      for (let k = 0; k < h.add; k++) rows.push({ line: h.n + k + 1 });
+      for (let k = 0; k < h.add; k++)
+        rows.push({ line: h.n + k + 1, marks: h.words[k]?.b ?? undefined });
       for (let k = 0; k < Math.max(0, h.del - h.add); k++)
         rows.push({ widget: widget('spacer', 0), at: lineStart(h.n + h.add) });
     } else {
-      for (let k = 0; k < h.del; k++) rows.push({ line: h.o + k + 1 });
+      for (let k = 0; k < h.del; k++)
+        rows.push({ line: h.o + k + 1, marks: h.words[k]?.a ?? undefined });
       for (let k = 0; k < Math.max(0, h.add - h.del); k++)
         rows.push({ widget: widget('spacer', 0), at: lineStart(h.o + h.del) });
     }
@@ -271,6 +291,15 @@ function buildState(
             attributes: { 'data-diff-hunk': String(hi) },
           }).range(doc.line(r.line).from),
         );
+        if (r.marks && r.marks[1] > r.marks[0]) {
+          const base = doc.line(r.line).from;
+          ranges.push(
+            Decoration.mark({ class: wordCls }).range(
+              base + r.marks[0],
+              base + r.marks[1],
+            ),
+          );
+        }
       } else if (r.widget && r.at) {
         const w = new RowWidget(
           r.widget.kind,
@@ -279,6 +308,7 @@ function buildState(
           edge,
           lang,
           r.widget.hunkIndex,
+          r.widget.marks,
         );
         ranges.push(
           Decoration.widget({ widget: w, block: true, side: r.at.side }).range(
@@ -1034,9 +1064,13 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
           lock = false;
           return;
         }
-        if (from.scrollTop !== to.scrollTop) {
+        if (
+          from.scrollTop !== to.scrollTop ||
+          from.scrollLeft !== to.scrollLeft
+        ) {
           lock = true;
           to.scrollTop = from.scrollTop;
+          to.scrollLeft = from.scrollLeft;
         }
       };
       const fa = link(a, b);

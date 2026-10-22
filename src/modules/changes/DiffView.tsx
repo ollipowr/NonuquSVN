@@ -10,10 +10,45 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { wrapRange } from './conflicts.js';
+import { wordDiff } from './diffHunks.js';
 import { nextChangeIndex } from './diffNavigation.js';
 
 const isChangeCls = (cls?: string) =>
   cls === 'svn-diff-add' || cls === 'svn-diff-del';
+
+/** Row indices shown on the old and new side of one display row; -1 leaves that side empty. */
+type SplitUnit = [number, number];
+
+export function pairSplitRows(rows: { cls: string }[]): SplitUnit[] {
+  const out: SplitUnit[] = [];
+  for (let i = 0; i < rows.length; ) {
+    if (!isChangeCls(rows[i].cls)) {
+      out.push([i, i]);
+      i++;
+      continue;
+    }
+    let dels = i;
+    while (rows[dels]?.cls === 'svn-diff-del') dels++;
+    let adds = dels;
+    while (rows[adds]?.cls === 'svn-diff-add') adds++;
+    for (let k = 0; k < Math.max(dels - i, adds - dels); k++)
+      out.push([i + k < dels ? i + k : -1, dels + k < adds ? dels + k : -1]);
+    i = adds;
+  }
+  return out;
+}
+
+type Mark = { range: [number, number]; cls: string };
+type Row = {
+  cls: string;
+  o: string;
+  n: string;
+  sign: string;
+  body: string;
+  plain: boolean;
+  marks?: Mark;
+};
 
 /** Shared chrome for editable and read-only diff editors. */
 export function DiffHeader({
@@ -183,7 +218,7 @@ export const DiffView = forwardRef<
     let oldN = 0;
     let newN = 0;
     let inHunk = false;
-    return text.split('\n').flatMap((line) => {
+    const rows: Row[] = text.split('\n').flatMap((line): Row | Row[] => {
       const hunk = /^@@ -(\d+)(?:,\d+)? \+(\d+)/.exec(line);
       if (hunk) {
         oldN = parseInt(hunk[1], 10);
@@ -246,15 +281,43 @@ export const DiffView = forwardRef<
         plain: false,
       };
     });
+    for (let i = 0; i < rows.length; ) {
+      if (rows[i].cls !== 'svn-diff-del') {
+        i++;
+        continue;
+      }
+      let dels = i;
+      while (rows[dels]?.cls === 'svn-diff-del') dels++;
+      let adds = dels;
+      while (rows[adds]?.cls === 'svn-diff-add') adds++;
+      for (let p = 0; p < Math.min(dels - i, adds - dels); p++) {
+        const w = wordDiff(rows[i + p].body, rows[dels + p].body);
+        if (!w) continue;
+        rows[i + p].marks = { range: w.a, cls: 'svn-diff-word-del' };
+        rows[dels + p].marks = { range: w.b, cls: 'svn-diff-word-add' };
+      }
+      i = adds;
+    }
+    return rows;
   }, [text, hideHunks, hideMetadata]);
+  // Split view pairs each deleted line with its added counterpart so both panes share row heights.
+  const units = useMemo(
+    () =>
+      mode === 'split'
+        ? pairSplitRows(rows)
+        : rows.map((_, i): SplitUnit => [i, i]),
+    [rows, mode],
+  );
   const jump = useCallback(
     (direction: 'prev' | 'next') => {
       const root = host.current;
       if (!root) return false;
-      const starts = rows.flatMap((row, index) =>
-        isChangeCls(row.cls) && !isChangeCls(rows[index - 1]?.cls)
-          ? [index]
-          : [],
+      const isChangeUnit = (unit: SplitUnit | undefined) =>
+        !!unit &&
+        ((unit[0] >= 0 && isChangeCls(rows[unit[0]].cls)) ||
+          (unit[1] >= 0 && isChangeCls(rows[unit[1]].cls)));
+      const starts = units.flatMap((unit, index) =>
+        isChangeUnit(unit) && !isChangeUnit(units[index - 1]) ? [index] : [],
       );
       const index = nextChangeIndex(
         navigationIndex.current,
@@ -280,18 +343,18 @@ export const DiffView = forwardRef<
           pane.clientHeight / 2 +
           target.offsetHeight / 2;
         for (
-          let row = starts[index];
-          row < rows.length && isChangeCls(rows[row].cls);
-          row++
+          let unit = starts[index];
+          unit < units.length && isChangeUnit(units[unit]);
+          unit++
         ) {
           pane
             .querySelectorAll<HTMLElement>('.svn-line')
-            [row]?.classList.add('svn-change-focus');
+            [unit]?.classList.add('svn-change-focus');
         }
       }
       return true;
     },
-    [rows, mode],
+    [rows, units, mode],
   );
   useImperativeHandle(ref, () => ({ jump }), [jump]);
   useEffect(() => {
@@ -318,23 +381,18 @@ export const DiffView = forwardRef<
     ).find((item) => item !== pane);
     if (other && other.scrollTop !== pane.scrollTop)
       other.scrollTop = pane.scrollTop;
+    if (other && other.scrollLeft !== pane.scrollLeft)
+      other.scrollLeft = pane.scrollLeft;
   };
   if (!text) {
     return <div className="svn-diff-body" />;
   }
+  const emptySide = (u: number) => (
+    <div key={`e${u}`} className="svn-line svn-split-empty">
+      &nbsp;
+    </div>
+  );
   const line = (r: (typeof rows)[number], i: number, side?: 'old' | 'new') => {
-    if (side === 'old' && r.cls === 'svn-diff-add')
-      return (
-        <div key={i} className="svn-line svn-split-empty">
-          &nbsp;
-        </div>
-      );
-    if (side === 'new' && r.cls === 'svn-diff-del')
-      return (
-        <div key={i} className="svn-line svn-split-empty">
-          &nbsp;
-        </div>
-      );
     const lineNumbers =
       side === 'old' ? (
         <span className="svn-ln">{r.o}</span>
@@ -356,7 +414,7 @@ export const DiffView = forwardRef<
         {r.plain ? (
           <span className="svn-code-text">{r.body || ' '}</span>
         ) : (
-          <Code line={r.body} lang={lang} />
+          <Code line={r.body} lang={lang} marks={r.marks} />
         )}
       </div>
     );
@@ -390,7 +448,9 @@ export const DiffView = forwardRef<
                 {splitHeaders.old}
               </div>
             )}
-            {rows.map((r, i) => line(r, i, 'old'))}
+            {units.map(([l], u) =>
+              l >= 0 ? line(rows[l], l, 'old') : emptySide(u),
+            )}
           </div>
           <Splitter direction="h" onMouseDown={split.onMouseDown} />
           <div
@@ -402,7 +462,9 @@ export const DiffView = forwardRef<
                 {splitHeaders.new}
               </div>
             )}
-            {rows.map((r, i) => line(r, i, 'new'))}
+            {units.map(([, r], u) =>
+              r >= 0 ? line(rows[r], r, 'new') : emptySide(u),
+            )}
           </div>
         </>
       ) : (
@@ -412,11 +474,25 @@ export const DiffView = forwardRef<
   );
 });
 
-function Code({ line, lang }: { line: string; lang: string | null }) {
+function Code({
+  line,
+  lang,
+  marks,
+}: {
+  line: string;
+  lang: string | null;
+  marks?: Mark;
+}) {
+  const html = useMemo(() => {
+    const el = document.createElement('span');
+    el.innerHTML = highlightLine(line, lang) || ' ';
+    if (marks) wrapRange(el, marks.range[0], marks.range[1], marks.cls);
+    return el.innerHTML;
+  }, [line, lang, marks]);
   return (
     <span
       className="svn-code-text"
-      dangerouslySetInnerHTML={{ __html: highlightLine(line, lang) || ' ' }}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
 }
