@@ -207,7 +207,9 @@ export function WorkspaceBar({
           ariaLabel={t('currentProject') as string}
           disabled={switching}
           onOpen={
-            store.projects.length === 0 && onAddProject ? onAddProject : undefined
+            store.projects.length === 0 && onAddProject
+              ? onAddProject
+              : undefined
           }
           panelTitle={t('chooseProject') as string}
           panelHint={(t('chooseProjectHint') as (n: number) => string)(
@@ -242,8 +244,9 @@ export function WorkspaceBar({
             label: p.name,
             menu: (e) => projectMenu(e, p),
             description: (t('homeCopies') as (n: number) => string)(
-              store.workspaces.filter((w) => w.projectId === p.id && w.localPath)
-                .length,
+              store.workspaces.filter(
+                (w) => w.projectId === p.id && w.localPath,
+              ).length,
             ),
           }))}
           onChange={(projectId) =>
