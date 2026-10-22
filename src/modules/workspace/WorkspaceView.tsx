@@ -1545,6 +1545,18 @@ export function WorkspaceView({
                 onResolve: onResolveAny,
               }}
             />
+            <CommitComposer
+              message={message}
+              setMessage={setMessage}
+              generating={generating}
+              busy={busy}
+              committable={[...committable, ...unversionedSelected]}
+              conflictedSelected={conflictedSelected}
+              commitHeight={commitHeight}
+              startCommitSplitterDrag={startCommitSplitterDrag}
+              onGenerateMessage={onGenerateMessage}
+              onCommit={onCommit}
+            />
           </div>
 
           <Splitter direction="h" onMouseDown={startSplitterDrag} />
@@ -1813,18 +1825,6 @@ export function WorkspaceView({
           />
         )}
 
-        <CommitComposer
-          message={message}
-          setMessage={setMessage}
-          generating={generating}
-          busy={busy}
-          committable={[...committable, ...unversionedSelected]}
-          conflictedSelected={conflictedSelected}
-          commitHeight={commitHeight}
-          startCommitSplitterDrag={startCommitSplitterDrag}
-          onGenerateMessage={onGenerateMessage}
-          onCommit={onCommit}
-        />
       </div>
     </div>
   );
