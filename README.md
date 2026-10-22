@@ -14,11 +14,13 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
-## Why "Nonuqu"?
-
-From the Latin *nonnumquam*, literally "not never", which means "sometimes". Shortened to **nonuqu**, it follows the motto *never say never*.
-
-Subversion may be quieter than Git these days, but it is still going strong in many teams, and it deserves a client that feels good to use.
+<p align="center">
+  <a href="assets/log-diff-dark-coffee.png">
+    <img src="assets/log-diff-dark-coffee.png" alt="NonuquSVN log view with a commit's changed files and a diff in the Dark Coffee theme" width="640">
+  </a>
+  <br>
+  <sub>Log view with changed files and diff (Dark Coffee theme). Click to enlarge.</sub>
+</p>
 
 ## Git-like, on top of Subversion
 
@@ -29,13 +31,11 @@ Subversion is solid, but its tooling often feels dated. NonuquSVN brings the wor
 
 Your repository stays plain Subversion.
 
-<p align="center">
-  <a href="assets/log-diff-dark-coffee.png">
-    <img src="assets/log-diff-dark-coffee.png" alt="NonuquSVN log view with a commit's changed files and a diff in the Dark Coffee theme" width="640">
-  </a>
-  <br>
-  <sub>Log view with changed files and diff (Dark Coffee theme). Click to enlarge.</sub>
-</p>
+## Why "Nonuqu"?
+
+From the Latin *nonnumquam*, literally "not never", which means "sometimes". Shortened to **nonuqu**, it follows the motto *never say never*.
+
+Subversion may be quieter than Git these days, but it is still going strong in many teams, and it deserves a client that feels good to use.
 
 ## Features
 
