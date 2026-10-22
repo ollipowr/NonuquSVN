@@ -1,7 +1,7 @@
 .svn-file-change-indicator {
   display: inline-block;
   min-width: 1ch;
-  font: 700 11px / 1 var(--nonu-font-mono, monospace);
+  font: 700 var(--nonu-text-xs) / 1 var(--nonu-font-mono, monospace);
   text-align: center;
 }
 .svn-file-change-indicator--added {

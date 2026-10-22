@@ -8,6 +8,7 @@ import type { HostAdapter } from '@nonu/host/types';
 import { listAiModels } from '@nonu/stores';
 import { scanFormatterRules } from '@nonu/utils';
 import {
+  applyFontScale,
   DEFAULT_SETTINGS,
   type FormatterRule,
   loadSettings,
@@ -134,6 +135,11 @@ export function SvnSettingsPanel({
     update('uiLanguage', locale);
   };
 
+  const updateFontScale = (scale: number) => {
+    applyFontScale(scale);
+    update('fontScale', scale);
+  };
+
   return (
     <div className="svn-settings">
       <ViewHeader title={t('settingsTitle') as string}>
@@ -186,6 +192,30 @@ export function SvnSettingsPanel({
                           },
                         ]}
                         onChange={(v) => updateLocale(v as Locale)}
+                      />
+                    </Row>
+                    <Row label={t('settingsFontSize') as string}>
+                      <Select
+                        value={String(settings.fontScale)}
+                        options={[
+                          {
+                            value: '0.9',
+                            label: t('settingsFontSmall') as string,
+                          },
+                          {
+                            value: '1',
+                            label: t('settingsFontDefault') as string,
+                          },
+                          {
+                            value: '1.15',
+                            label: t('settingsFontLarge') as string,
+                          },
+                          {
+                            value: '1.3',
+                            label: t('settingsFontXLarge') as string,
+                          },
+                        ]}
+                        onChange={(v) => updateFontScale(Number(v))}
                       />
                     </Row>
                   </Card>

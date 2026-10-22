@@ -38,7 +38,7 @@
   cursor: pointer;
 }
 .svn-settings-nav-item .material-symbols-outlined {
-  font-size: 18px;
+  font-size: var(--nonu-icon-xl);
 }
 .svn-settings-nav-item:hover {
   background: var(--nonu-bg-tertiary);

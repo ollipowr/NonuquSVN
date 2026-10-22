@@ -20,7 +20,7 @@
 }
 .svn-home-intro h1 {
   margin: 0 0 6px;
-  font-size: 32px;
+  font-size: var(--nonu-text-display);
   letter-spacing: -0.03em;
 }
 .svn-home-intro p {
@@ -60,7 +60,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 19px;
+  font-size: var(--nonu-text-xl);
   font-weight: 650;
   letter-spacing: -0.6px;
 }
@@ -209,7 +209,7 @@
   padding: 1px 0;
   border: 1px solid var(--nonu-border);
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--nonu-text-xs);
   letter-spacing: 0.5px;
   text-align: center;
   text-transform: uppercase;

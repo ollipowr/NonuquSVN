@@ -55,15 +55,19 @@
   --nonu-scrollbar: #4b4a4a;
   --nonu-scrollbar-hover: #5a5b5a;
   /* Font-size scale */
-  --nonu-text-xs:   10px;  /* badges, timestamps, meta */
-  --nonu-text-sm:   11px;  /* standard UI rows & labels */
-  --nonu-text-md:   12px;  /* titlebar, dialog-body, secondary */
-  --nonu-text-base: 13px;  /* body text, log messages, inputs */
-  --nonu-text-lg:   15px;  /* section headings (h3) */
+  --nonu-font-scale: 1;
+  --nonu-text-xs:   calc(11px * var(--nonu-font-scale));  /* badges, timestamps, meta */
+  --nonu-text-sm:   calc(12px * var(--nonu-font-scale));  /* standard UI rows & labels */
+  --nonu-text-md:   calc(13px * var(--nonu-font-scale));  /* titlebar, dialog-body, secondary */
+  --nonu-text-base: calc(14px * var(--nonu-font-scale));  /* body text, log messages, inputs */
+  --nonu-text-lg:   calc(16px * var(--nonu-font-scale));  /* section headings (h3) */
+  --nonu-text-xl:   calc(19px * var(--nonu-font-scale));  /* lead text, start page intro */
+  --nonu-text-display: calc(32px * var(--nonu-font-scale)); /* start page title */
   /* Icon scale (material-symbols) */
   --nonu-icon-sm:   14px;  /* inline icons: chevrons, folder */
   --nonu-icon-md:   16px;  /* standard row icons */
   --nonu-icon-lg:   20px;  /* activity bar, brand */
+  --nonu-icon-xl:   18px;  /* settings nav, choice icons, row more-button */
 }
 
 /* light theme */
@@ -87,8 +91,6 @@
     --nonu-font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', monospace;
     --nonu-scrollbar: #d1d5dc;
     --nonu-scrollbar-hover: #9da3af;
-    --nonu-text-xs: 10px; --nonu-text-sm: 11px; --nonu-text-md: 12px; --nonu-text-base: 13px; --nonu-text-lg: 15px;
-    --nonu-icon-sm: 14px; --nonu-icon-md: 16px; --nonu-icon-lg: 20px;
   }
 }
 
@@ -522,6 +524,7 @@ body,
 .svn-standalone-home-shell { display: flex; flex: 1; min-height: 0; min-width: 0; }
 .svn-standalone-home-content { display: flex; flex: 1; min-height: 0; min-width: 0; }
 .svn-standalone-home-content[hidden] { display: none; }
+.svn-standalone-home-column { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
 .svn-standalone-main { flex: 1; min-height: 0; }
 .svn-standalone-pathbar {
   display: flex; align-items: center; gap: 8px; padding: 4px 8px;

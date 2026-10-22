@@ -59,9 +59,10 @@ export interface SvnSettings {
   singleProject: boolean;
   aiRules: string;
   uiLanguage: Locale;
+  /** Multiplier for all UI text sizes (see --nonu-font-scale). */
+  fontScale: number;
   formatterRules: FormatterRule[];
 }
-
 export const DEFAULT_SETTINGS: SvnSettings = {
   aiProvider: 'claude-code',
   aiModel: 'claude-code:haiku',
@@ -79,6 +80,7 @@ export const DEFAULT_SETTINGS: SvnSettings = {
   autoRefresh: true,
   aiRules: COMMIT_MESSAGE_RULES,
   uiLanguage: 'de',
+  fontScale: 1,
   formatterRules: [],
 };
 
@@ -103,7 +105,12 @@ export function loadSettings(storage: HostStorage): SvnSettings {
     ];
   }
   setLocale(merged.uiLanguage);
+  applyFontScale(merged.fontScale);
   return merged;
+}
+
+export function applyFontScale(scale: number) {
+  document.documentElement.style.setProperty('--nonu-font-scale', String(scale));
 }
 
 export function saveSettings(
