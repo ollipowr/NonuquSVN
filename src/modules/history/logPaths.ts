@@ -55,7 +55,7 @@ export function absoluteLocalLogPath(
   const separator = repo.root.includes('\\') ? '\\' : '/';
   const root = repo.root.replace(/[\\/]+$/, '');
   if (relative === '.') return root;
-  return `${root}${separator}${relative.replaceAll('/', separator)}`;
+  return `${root}${separator}${relative.replace(/\//g, separator)}`;
 }
 
 /** Peg revisions keep history actions valid after later moves or deletions. */

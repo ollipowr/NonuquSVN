@@ -1,5 +1,5 @@
 import type { HostAdapter } from '@nonu/host/types';
-import type { FormatterRule } from '@nonu/modules/workspace';
+import type { FormatterRule } from '@nonu/modules/settings/settings';
 
 const SCAN_RULES: Array<{ glob: string; cmd: string }> = [
   { glob: 'biome.json', cmd: 'npx biome format --write .' },

@@ -1,5 +1,5 @@
 import { t } from '@nonu/app/i18n';
-import type { SvnSettings } from '@nonu/modules/workspace';
+import type { SvnSettings } from '@nonu/modules/settings/settings';
 import {
   getPanelHost,
   loadSnapshot,

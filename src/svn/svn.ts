@@ -383,8 +383,7 @@ export function parseSvnStatus(
         status !== 'unversioned' &&
         status !== 'missing' &&
         status !== 'conflicted' &&
-        status !== 'ignored' &&
-        status !== 'external',
+        status !== 'ignored',
       ...(treeConflict ? { treeConflict: true } : {}),
       ...(lockedByMe ? { lockedByMe: true } : {}),
       ...(propsOnly ? { propsOnly: true } : {}),

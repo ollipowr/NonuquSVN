@@ -28,6 +28,7 @@ declare global {
       zoom(delta: number): void;
       setTitleBarTheme(color: string, symbolColor: string): Promise<void>;
       appIconUrl(): string;
+      devClearStorage(): Promise<void>;
     };
   }
 }
