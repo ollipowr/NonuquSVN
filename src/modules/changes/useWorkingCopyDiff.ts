@@ -18,10 +18,9 @@ export function mergeinfoDiff(oldValue: string, newValue: string): string {
     ...newLines.filter((l) => !oldSet.has(l)).map((l) => `+${l}`),
   ];
   if (body.every((l) => l.startsWith(' '))) return '';
-  return [
-    `@@ -1,${oldLines.length} +1,${newLines.length} @@`,
-    ...body,
-  ].join('\n');
+  return [`@@ -1,${oldLines.length} +1,${newLines.length} @@`, ...body].join(
+    '\n',
+  );
 }
 
 export function useWorkingCopyDiff({

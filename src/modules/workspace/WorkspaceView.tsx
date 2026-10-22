@@ -720,7 +720,11 @@ export function WorkspaceView({
   }, [cwd, changes, host]);
 
   // Load the focused file's diff. Cached diffs show at once and revalidate after refresh; unversioned files show raw content.
-  const rootName = cwd.replace(/[\\/]+$/, '').split(/[\\/]/).pop() ?? cwd;
+  const rootName =
+    cwd
+      .replace(/[\\/]+$/, '')
+      .split(/[\\/]/)
+      .pop() ?? cwd;
   const activeEntry = changes.find((c) => c.path === active);
   const activeStatus = activeEntry?.status;
   const { diff, setDiff, diffIsNewFile } = useWorkingCopyDiff({
