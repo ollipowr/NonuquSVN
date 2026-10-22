@@ -12,7 +12,9 @@ import { useResize } from '@nonu/hooks';
 import {
   DiffControls,
   DiffHeader,
-  DiffView,
+  type DiffFiles,
+  EditableDiff,
+  type EditableDiffHandle,
   FileChangeIndicator,
   type FileChangeKind,
 } from '@nonu/modules/changes';
@@ -35,7 +37,11 @@ type Props = {
   diffMode: 'inline' | 'split';
   onDiffModeChange: (mode: 'inline' | 'split') => void;
   load: (query: Query) => Promise<SvnLogEntry[]>;
-  loadDiff: (revision: string, path: string, action: string) => Promise<string>;
+  loadRevisionFiles: (
+    revision: string,
+    path: string,
+    action: string,
+  ) => Promise<DiffFiles>;
   onOpenFile?: (path: string) => void | Promise<void>;
   onLogFile: (
     path: string,
@@ -74,12 +80,6 @@ const toDateValue = (iso: string) => {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}`;
 };
-const diffRevisions = (text: string, revision: string) => {
-  const revisions = Array.from(
-    text.matchAll(/^[-+]{3}\s+.*?\s+\(revision\s+(\d+)\)\s*$/gm),
-  ).map((match) => match[1]);
-  return { old: revisions[0] ?? revision, new: revisions[1] ?? revision };
-};
 const revisionHeader = (revision: string, entry?: SvnLogEntry) =>
   `r${revision} · ${entry?.date ? date(entry.date) : '-'} · ${entry?.author || '-'}`;
 
@@ -87,7 +87,7 @@ export function LogView({
   diffMode,
   onDiffModeChange,
   load,
-  loadDiff,
+  loadRevisionFiles,
   onOpenFile,
   onLogFile,
   onBlameFile,
@@ -103,14 +103,11 @@ export function LogView({
   const [loading, setLoading] = useState(false);
   const [paging, setPaging] = useState(false);
   const [error, setError] = useState('');
-  const [diff, setDiff] = useState('');
-  const [diffHeaders, setDiffHeaders] = useState<{
-    old: string;
-    new: string;
-  }>();
+  const [diff, setDiff] = useState<DiffFiles | null>(null);
+  const [diffHeaders, setDiffHeaders] = useState<{ old: string; new: string }>();
   const [diffLoading, setDiffLoading] = useState(false);
   const [diffError, setDiffError] = useState('');
-  const [jumpRequest, setJumpRequest] = useState(0);
+  const diffRef = useRef<EditableDiffHandle>(null);
   const [width, setWidth] = useState(34);
   const [detailWidth, setDetailWidth] = useState(30);
   const [menu, setMenu] = useState<{
@@ -188,11 +185,10 @@ export function LogView({
   useEffect(() => {
     ++diffGeneration.current;
     setPath(undefined);
-    setDiff('');
+    setDiff(null);
     setDiffHeaders(undefined);
     setDiffError('');
     setDiffLoading(false);
-    setJumpRequest(0);
   }, [revision]);
   useEffect(
     () => () => {
@@ -204,22 +200,21 @@ export function LogView({
     if (!active) return;
     const id = ++diffGeneration.current;
     setPath(itemPath);
-    setDiff('');
+    setDiff(null);
     setDiffHeaders(undefined);
     setDiffLoading(true);
     setDiffError('');
-    setJumpRequest(0);
     try {
-      const result = await loadDiff(
+      const result = await loadRevisionFiles(
         active.revision,
         itemPath.path,
         itemPath.action,
       );
-      const revisions = diffRevisions(result, active.revision);
+      const previous = String(Math.max(0, Number(active.revision) - 1));
       let oldEntry: SvnLogEntry | undefined;
-      if (revisions.old !== active.revision && revisions.old !== '0') {
+      if (itemPath.action !== 'A' && previous !== '0') {
         try {
-          oldEntry = (await load({ revision: revisions.old, limit: 1 }))[0];
+          oldEntry = (await load({ revision: previous, limit: 1 }))[0];
         } catch {
           /* The diff remains useful without historic metadata. */
         }
@@ -227,8 +222,9 @@ export function LogView({
       if (id === diffGeneration.current) {
         setDiff(result);
         setDiffHeaders({
-          old: revisionHeader(revisions.old, oldEntry),
-          new: revisionHeader(revisions.new, active),
+          old:
+            itemPath.action === 'A' ? '' : revisionHeader(previous, oldEntry),
+          new: revisionHeader(active.revision, active),
         });
       }
     } catch (reason) {
@@ -536,13 +532,7 @@ export function LogView({
             <DiffControls
               mode={diffMode}
               onModeChange={onDiffModeChange}
-              onJump={(direction) =>
-                setJumpRequest((current) =>
-                  direction === 'next'
-                    ? Math.abs(current) + 1
-                    : -(Math.abs(current) + 1),
-                )
-              }
+              onJump={(direction) => diffRef.current?.jump(direction)}
               syncScroll={syncDiffScroll}
               onSyncScrollChange={setSyncDiffScroll}
             />
@@ -554,16 +544,17 @@ export function LogView({
           ) : diffLoading ? (
             <div className="svn-log-state">{t('refreshing') as string}</div>
           ) : (
-            <DiffView
-              text={diff}
-              path={path?.path ?? null}
-              mode={diffMode}
-              jumpRequest={jumpRequest}
-              hideHunks
-              hideMetadata
-              splitHeaders={diffHeaders}
-              syncScroll={syncDiffScroll}
-            />
+            diff &&
+            path && (
+              <EditableDiff
+                ref={diffRef}
+                fixed={diff}
+                headers={diffHeaders}
+                path={path.path}
+                mode={diffMode}
+                syncScroll={syncDiffScroll}
+              />
+            )
           )}
         </section>
       </div>

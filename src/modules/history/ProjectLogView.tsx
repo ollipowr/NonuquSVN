@@ -7,6 +7,7 @@ import {
   loadFileBlame,
   loadFileHistory,
   loadHistory,
+  loadRevisionFiles,
 } from './historyLoader.js';
 import { LogDialog } from './LogDialog.js';
 import { LogView } from './LogView.js';
@@ -46,13 +47,14 @@ export function ProjectLogView({
         diffMode={mode}
         onDiffModeChange={setMode}
         load={(query) => loadHistory(cwd, query, url)}
-        loadDiff={async (revision, path) => {
-          const { stdout } = await runSvn(
-            ['diff', '-c', revision, await target(path, revision)],
+        loadRevisionFiles={(revision, path, action) =>
+          loadRevisionFiles(
             cwd,
-          );
-          return stdout;
-        }}
+            (rev) => target(path, rev),
+            revision,
+            action,
+          )
+        }
         onLogFile={async (path, revision) =>
           setLog({
             path,

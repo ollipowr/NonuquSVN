@@ -623,28 +623,38 @@ export interface EditableDiffState {
   externalChanged: boolean;
 }
 
+export interface DiffFiles {
+  base: string;
+  work: string;
+}
+
 interface Props {
   path: string;
-  cwd: string;
-  /** Last-write timestamp used to reuse content until the working copy changes. */
-  cacheVersion: number;
   mode: 'inline' | 'split';
+  syncScroll?: boolean;
+  /** Read-only contents (for example a revision); skips the working-copy load. */
+  fixed?: DiffFiles;
+  headers?: { old: string; new: string };
+  cwd?: string;
+  /** Last-write timestamp used to reuse content until the working copy changes. */
+  cacheVersion?: number;
   /** Unversioned files have no BASE; skip fetching it. */
   unversioned?: boolean;
-  syncScroll?: boolean;
-  onStateChange: (s: EditableDiffState) => void;
-  onSaved: () => void;
+  onStateChange?: (s: EditableDiffState) => void;
+  onSaved?: () => void;
 }
 
 export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
   function EditableDiff(
     {
       path,
-      cwd,
-      cacheVersion,
+      cwd = '',
+      cacheVersion = 0,
       mode,
       unversioned,
       syncScroll = true,
+      fixed,
+      headers,
       onStateChange,
       onSaved,
     },
@@ -696,12 +706,12 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
     externalChangedRef.current = externalChanged;
 
     useEffect(
-      () => onStateChange({ dirty, saving, error, externalChanged }),
+      () => onStateChange?.({ dirty, saving, error, externalChanged }),
       [dirty, saving, error, externalChanged, onStateChange],
     );
     useEffect(
       () => () =>
-        onStateChange({
+        onStateChange?.({
           dirty: false,
           saving: false,
           error: null,
@@ -710,9 +720,24 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
       [onStateChange],
     );
 
+    useEffect(() => {
+      if (!fixed) return;
+      const base = fixed.base.replace(/\r\n/g, '\n');
+      const work = fixed.work.replace(/\r\n/g, '\n');
+      savedRef.current = work;
+      textRef.current = work;
+      setText(work);
+      setFiles({
+        base,
+        work,
+        crlf: false,
+        enc: { text: work, encoding: 'utf8', bom: false },
+      });
+    }, [fixed]);
+
     // Clean editors reload automatically; dirty ones keep their buffer and need an explicit reload.
     useEffect(() => {
-      if (formattingRef.current) return;
+      if (fixed || !cwd || formattingRef.current) return;
       let cancelled = false;
       (async () => {
         const loaded = await readEditableFile(
@@ -830,7 +855,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
           setExternalChanged(false);
           setText(t);
           setSaving(false);
-          onSaved();
+          onSaved?.();
           return true;
         } catch (err) {
           setError(err instanceof Error ? err.message : String(err));
@@ -855,7 +880,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
       externalFileRef.current = null;
       setExternalChanged(false);
       setError(null);
-      onSaved();
+      onSaved?.();
       return true;
     }, [onSaved]);
 
@@ -903,7 +928,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
 
     const openHunkMenu = useCallback(
       (event: React.MouseEvent<HTMLDivElement>, side: 'base' | 'working') => {
-        if (mode !== 'split') return;
+        if (mode !== 'split' || fixed) return;
         const target = event.target as Element;
         const row = target.closest<HTMLElement>('[data-diff-hunk]');
         const hunkIndex = Number(row?.dataset.diffHunk);
@@ -913,7 +938,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
         setFocus_(hunkIndex);
         setMenu({ x: event.clientX, y: event.clientY, hunk, side });
       },
-      [hunks, mode],
+      [hunks, mode, fixed],
     );
 
     const formatInPlace = useCallback(
@@ -1030,6 +1055,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
     const main = (
       <DiffPane
         conflict={conflict}
+        readOnly={Boolean(fixed)}
         doc={files.work}
         mode={mode === 'split' ? 'split-right' : 'inline'}
         lang={lang}
@@ -1046,7 +1072,16 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
       />
     );
     if (mode === 'inline' || conflict)
-      return <div className="svn-diff-body svn-cm-wrap">{main}</div>;
+      return (
+        <div className="svn-diff-body svn-cm-wrap">
+          {headers && (
+            <div className="svn-diff-pane-head">
+              {[headers.old, headers.new].filter(Boolean).join('  →  ')}
+            </div>
+          )}
+          {main}
+        </div>
+      );
     return (
       <>
         <div
@@ -1054,6 +1089,11 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
           style={split.style}
         >
           <div className="svn-split-pane svn-cm-wrap">
+            {headers && (
+              <div className="svn-diff-pane-head" title={headers.old}>
+                {headers.old}
+              </div>
+            )}
             <DiffPane
               doc={files.base}
               mode="split-left"
@@ -1070,7 +1110,14 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
             />
           </div>
           <Splitter direction="h" onMouseDown={split.onMouseDown} />
-          <div className="svn-split-pane svn-cm-wrap">{main}</div>
+          <div className="svn-split-pane svn-cm-wrap">
+            {headers && (
+              <div className="svn-diff-pane-head" title={headers.new}>
+                {headers.new}
+              </div>
+            )}
+            {main}
+          </div>
         </div>
         {menu && (
           <ContextMenu

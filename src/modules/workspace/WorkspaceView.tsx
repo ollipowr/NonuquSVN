@@ -43,6 +43,7 @@ import {
   loadFileBlame,
   loadFileHistory,
   loadHistory,
+  loadRevisionFiles,
   logFileTarget,
 } from '@nonu/modules/history';
 import {
@@ -1635,23 +1636,17 @@ export function WorkspaceView({
                     : undefined,
                 )
               }
-              loadDiff={async (revision, path, action) => {
-                if (!cwd) return '';
+              loadRevisionFiles={async (revision, path, action) => {
+                if (!cwd) return { base: '', work: '' };
                 // Repository-rooted log paths: `^/` keeps the lookup in the repository, not the working copy.
-                const { target } = logFileTarget(
-                  path,
+                return loadRevisionFiles(
+                  cwd,
+                  async (rev) =>
+                    logFileTarget(path, rev, undefined, repo?.repositoryRoot)
+                      .target,
                   revision,
                   action,
-                  repo?.repositoryRoot,
                 );
-                const previousRevision = String(
-                  Math.max(0, Number(revision) - 1),
-                );
-                const { stdout } = await runSvn(
-                  ['diff', '-r', `${previousRevision}:${revision}`, target],
-                  cwd,
-                );
-                return stdout;
               }}
               onOpenFile={async (path) => {
                 const local = absoluteLocalLogPath(path, repo, cwd);

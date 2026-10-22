@@ -48,6 +48,23 @@ export async function loadFileHistory(
   return parseSvnLog(stdout);
 }
 
+/** A file's content before and after a revision; the side a change does not have is empty. */
+export async function loadRevisionFiles(
+  cwd: string,
+  targetAt: (revision: string) => Promise<string>,
+  revision: string,
+  action: string,
+) {
+  const previous = String(Math.max(0, Number(revision) - 1));
+  const read = async (rev: string) =>
+    (await runSvn(['cat', '-r', rev, await targetAt(rev)], cwd)).stdout;
+  const [base, work] = await Promise.all([
+    action === 'A' ? '' : read(previous),
+    action === 'D' ? '' : read(revision),
+  ]);
+  return { base, work };
+}
+
 /** Omitted revision preserves the existing working-copy blame/BASE-content behavior. */
 export async function loadFileBlame(
   cwd: string,

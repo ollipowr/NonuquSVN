@@ -143,7 +143,6 @@ export const DiffView = forwardRef<
     text: string;
     path: string | null;
     mode?: 'inline' | 'split';
-    jumpRequest?: number;
     hideHunks?: boolean;
     hideMetadata?: boolean;
     splitHeaders?: { old: string; new: string };
@@ -154,7 +153,6 @@ export const DiffView = forwardRef<
     text,
     path,
     mode = 'inline',
-    jumpRequest = 0,
     hideHunks = false,
     hideMetadata = false,
     splitHeaders,
@@ -286,9 +284,6 @@ export const DiffView = forwardRef<
     [rows, mode],
   );
   useImperativeHandle(ref, () => ({ jump }), [jump]);
-  useEffect(() => {
-    if (jumpRequest) jump(jumpRequest > 0 ? 'next' : 'prev');
-  }, [jumpRequest]);
   useEffect(() => {
     const wasSyncing = previousSyncScroll.current;
     previousSyncScroll.current = syncScroll;
