@@ -36,6 +36,7 @@ export function WorkspaceBar({
   storage,
   onAddProject,
   onOpenWorkingCopy,
+  singleProject = false,
 }: {
   workspace: string;
   chrome?: WorkspaceChrome | null;
@@ -43,6 +44,7 @@ export function WorkspaceBar({
   storage: HostStorage;
   onAddProject?: () => void;
   onOpenWorkingCopy?: () => void;
+  singleProject?: boolean;
 }) {
   const [store, setStore] = useState(() => loadProjectStore(storage));
   const project = store.projects.find((p) => p.id === store.activeProjectId);
@@ -198,68 +200,70 @@ export function WorkspaceBar({
   };
   return (
     <div className="svn-titlebar-ws svn-workspace-bar">
-      <Select
-        className="svn-workspace-project-select"
-        value={project?.id ?? ''}
-        ariaLabel={t('currentProject') as string}
-        disabled={switching}
-        onOpen={
-          store.projects.length === 0 && onAddProject ? onAddProject : undefined
-        }
-        panelTitle={t('chooseProject') as string}
-        panelHint={(t('chooseProjectHint') as (n: number) => string)(
-          store.projects.length,
-        )}
-        trigger={
-          <>
-            <span
-              className="svn-workspace-choice-icon material-symbols-outlined"
-              aria-hidden="true"
-            >
-              folder_open
-            </span>
-            <span className="svn-workspace-choice-text">
-              <span className="svn-workspace-choice-kicker">
-                {t('currentProject')}
+      {!singleProject && (
+        <Select
+          className="svn-workspace-project-select"
+          value={project?.id ?? ''}
+          ariaLabel={t('currentProject') as string}
+          disabled={switching}
+          onOpen={
+            store.projects.length === 0 && onAddProject ? onAddProject : undefined
+          }
+          panelTitle={t('chooseProject') as string}
+          panelHint={(t('chooseProjectHint') as (n: number) => string)(
+            store.projects.length,
+          )}
+          trigger={
+            <>
+              <span
+                className="svn-workspace-choice-icon material-symbols-outlined"
+                aria-hidden="true"
+              >
+                folder_open
               </span>
-              <span className="svn-select-label">
-                {project?.name ??
-                  (store.projects.length
-                    ? (t('navProjects') as string)
-                    : `${t('projectCreateAction') as string}…`)}
+              <span className="svn-workspace-choice-text">
+                <span className="svn-workspace-choice-kicker">
+                  {t('currentProject')}
+                </span>
+                <span className="svn-select-label">
+                  {project?.name ??
+                    (store.projects.length
+                      ? (t('navProjects') as string)
+                      : `${t('projectCreateAction') as string}…`)}
+                </span>
               </span>
-            </span>
-            <span className="material-symbols-outlined" aria-hidden="true">
-              expand_more
-            </span>
-          </>
-        }
-        options={store.projects.map((p) => ({
-          value: p.id,
-          label: p.name,
-          menu: (e) => projectMenu(e, p),
-          description: (t('homeCopies') as (n: number) => string)(
-            store.workspaces.filter((w) => w.projectId === p.id && w.localPath)
-              .length,
-          ),
-        }))}
-        onChange={(projectId) =>
-          window.dispatchEvent(
-            new CustomEvent('svn-open-project', { detail: { projectId } }),
-          )
-        }
-        footer={[
-          ...(onAddProject
-            ? [
-                {
-                  label: t('projectCreateAction') as string,
-                  icon: 'add',
-                  onClick: onAddProject,
-                },
-              ]
-            : []),
-        ]}
-      />
+              <span className="material-symbols-outlined" aria-hidden="true">
+                expand_more
+              </span>
+            </>
+          }
+          options={store.projects.map((p) => ({
+            value: p.id,
+            label: p.name,
+            menu: (e) => projectMenu(e, p),
+            description: (t('homeCopies') as (n: number) => string)(
+              store.workspaces.filter((w) => w.projectId === p.id && w.localPath)
+                .length,
+            ),
+          }))}
+          onChange={(projectId) =>
+            window.dispatchEvent(
+              new CustomEvent('svn-open-project', { detail: { projectId } }),
+            )
+          }
+          footer={[
+            ...(onAddProject
+              ? [
+                  {
+                    label: t('projectCreateAction') as string,
+                    icon: 'add',
+                    onClick: onAddProject,
+                  },
+                ]
+              : []),
+          ]}
+        />
+      )}
       <Switcher
         store={{
           ...store,

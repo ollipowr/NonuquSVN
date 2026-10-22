@@ -63,6 +63,8 @@ export interface SvnSettings {
   fontScale: number;
   formatterRules: FormatterRule[];
 }
+export const SETTINGS_CHANGED_EVENT = 'svn-settings-changed';
+
 export const DEFAULT_SETTINGS: SvnSettings = {
   aiProvider: 'claude-code',
   aiModel: 'claude-code:haiku',
@@ -117,5 +119,7 @@ export function saveSettings(
   storage: HostStorage,
   settings: SvnSettings,
 ): Promise<void> {
-  return storage.setGlobal(SETTINGS_KEY, settings);
+  const saved = storage.setGlobal(SETTINGS_KEY, settings);
+  window.dispatchEvent(new Event(SETTINGS_CHANGED_EVENT));
+  return saved;
 }

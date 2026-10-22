@@ -22,6 +22,10 @@ import {
 import { startupWorkspace } from '@nonu/modules/projects/startup';
 import { RepoBrowserTab } from '@nonu/modules/repository/RepoBrowserTab';
 import { SvnSettingsPanel } from '@nonu/modules/settings/SettingsPanel';
+import {
+  loadSettings,
+  SETTINGS_CHANGED_EVENT,
+} from '@nonu/modules/settings/settings';
 import { buildNavViews } from '@nonu/modules/workspace/navViews';
 import { WorkspaceBar } from '@nonu/modules/workspace/WorkspaceBar';
 import {
@@ -182,9 +186,11 @@ const toContextItem = (it: MenuItem): ContextMenuItem =>
 function TitleBar({
   menus,
   storage,
+  title,
 }: {
   menus: MenuDef[];
   storage: HostStorage;
+  title: string;
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const nav = useNavExpanded(storage);
@@ -196,7 +202,7 @@ function TitleBar({
   return (
     <div className="svn-titlebar">
       <AppIcon />
-      <span className="svn-titlebar-title">NonuquSVN</span>
+      <span className="svn-titlebar-title">{title}</span>
       <div className="svn-menubar">
         <Button
           variant="ghost"
@@ -334,6 +340,15 @@ function HomeShell({
 }
 
 export function App({ adapter }: { adapter: HostAdapter }) {
+  const [singleProject, setSingleProject] = useState(
+    () => loadSettings(adapter.storage).singleProject,
+  );
+  useEffect(() => {
+    const sync = () =>
+      setSingleProject(loadSettings(adapter.storage).singleProject);
+    window.addEventListener(SETTINGS_CHANGED_EVENT, sync);
+    return () => window.removeEventListener(SETTINGS_CHANGED_EVENT, sync);
+  }, [adapter.storage]);
   const [workspacePath, setWorkspacePath] = useState<string | null>(
     adapter.workspacePath || null,
   );
@@ -354,6 +369,8 @@ export function App({ adapter }: { adapter: HostAdapter }) {
   const activeProject = projectStore.projects.find(
     (project) => project.id === projectStore.activeProjectId,
   );
+  const titleText =
+    singleProject && activeProject ? activeProject.name : 'NonuquSVN';
   const [chrome, setChrome] = useState<WorkspaceChrome | null>(null);
   const [switchingWorkspace, setSwitchingWorkspace] = useState(false);
   // Lives here, not in WorkspaceView: the view remounts per workspace (key below),
@@ -683,7 +700,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
   if (!workspacePath || showHome) {
     return (
       <>
-        <TitleBar menus={menus} storage={adapter.storage} />
+        <TitleBar menus={menus} storage={adapter.storage} title={titleText} />
         {navigationError && <div role="alert">{navigationError}</div>}
         {workspacePath ? (
           <WorkspaceBar
@@ -702,6 +719,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
             storage={adapter.storage}
             onAddProject={goStart(true)}
             onOpenWorkingCopy={() => void chooseFolder()}
+            singleProject={singleProject}
           />
         ) : (
           <WorkspaceBar
@@ -709,6 +727,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
             storage={adapter.storage}
             onAddProject={goStart(true)}
             onOpenWorkingCopy={() => void chooseFolder()}
+            singleProject={singleProject}
           />
         )}
         <HomeShell
@@ -760,7 +779,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
 
   return (
     <div className="svn-standalone-shell">
-      <TitleBar menus={menus} storage={adapter.storage} />
+      <TitleBar menus={menus} storage={adapter.storage} title={titleText} />
       {navigationError && <div role="alert">{navigationError}</div>}
       <WorkspaceBar
         workspace={workspacePath}
@@ -769,6 +788,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
         storage={adapter.storage}
         onAddProject={goStart(true)}
         onOpenWorkingCopy={() => void chooseFolder()}
+        singleProject={singleProject}
       />
       <div className="svn-standalone-main">
         <WorkspaceView

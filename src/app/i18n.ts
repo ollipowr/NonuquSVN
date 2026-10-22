@@ -307,7 +307,7 @@ const translations = {
       'Filter, Sortierung und Gruppierung über Neustarts merken',
     settingsOpenLastOnStart: 'Beim Start die letzte Arbeitskopie öffnen',
     settingsSingleProject:
-      'Ich habe nur ein Projekt (Projekte-Menü ausblenden)',
+      'Ich habe nur ein Projekt: an = Projekttitel als App-Titel, aus = Standard',
     homeContinue: 'Weiter mit',
     projectConflicts: 'Konflikte',
     projectUpdates: 'Updates verfügbar',
@@ -1022,7 +1022,8 @@ const translations = {
     settingsRememberView:
       'Remember filter, sorting and grouping across restarts',
     settingsOpenLastOnStart: 'Open the last working copy on startup',
-    settingsSingleProject: 'I only have one project (hide the Projects menu)',
+    settingsSingleProject:
+      'I only have one project: on = project name as app title, off = default',
     homeContinue: 'Continue with',
     projectConflicts: 'Conflicts',
     projectUpdates: 'Updates available',
