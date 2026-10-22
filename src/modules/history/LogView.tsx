@@ -11,8 +11,8 @@ import { TextInput } from '@nonu/components/ui/TextInput';
 import { useResize } from '@nonu/hooks';
 import {
   DiffControls,
-  DiffHeader,
   type DiffFiles,
+  DiffHeader,
   EditableDiff,
   type EditableDiffHandle,
   FileChangeIndicator,
@@ -104,7 +104,10 @@ export function LogView({
   const [paging, setPaging] = useState(false);
   const [error, setError] = useState('');
   const [diff, setDiff] = useState<DiffFiles | null>(null);
-  const [diffHeaders, setDiffHeaders] = useState<{ old: string; new: string }>();
+  const [diffHeaders, setDiffHeaders] = useState<{
+    old: string;
+    new: string;
+  }>();
   const [diffLoading, setDiffLoading] = useState(false);
   const [diffError, setDiffError] = useState('');
   const diffRef = useRef<EditableDiffHandle>(null);

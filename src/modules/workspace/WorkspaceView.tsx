@@ -2,17 +2,17 @@ import { t } from '@nonu/app/i18n';
 import {
   ActivityBar,
   AuthDialog,
-  OutputDock,
-  useOutputToggleAction,
   Button,
   ConfirmDialog,
   ContextMenu,
   type ContextMenuItem,
   Dialog,
   type LogEntry,
+  OutputDock,
   Splitter,
   Toast,
   useListSelection,
+  useOutputToggleAction,
   ViewHeader,
 } from '@nonu/components';
 import { useConfirmation, useContextMenu, useResize } from '@nonu/hooks';
@@ -68,6 +68,12 @@ import {
   setPanelHost,
 } from '@nonu/stores';
 import {
+  appendOutput,
+  setOutputBusy,
+  setOutputCollapsed,
+  setOutputVisible,
+} from '@nonu/stores/outputLog';
+import {
   commandTooLong,
   findDirectories,
   type OperationNotice as Pill,
@@ -87,12 +93,6 @@ import {
   startGeneration,
   subscribe,
 } from '@nonu/utils';
-import {
-  appendOutput,
-  setOutputBusy,
-  setOutputCollapsed,
-  setOutputVisible,
-} from '@nonu/stores/outputLog';
 import React, {
   useCallback,
   useEffect,

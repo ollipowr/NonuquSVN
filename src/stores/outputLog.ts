@@ -37,5 +37,4 @@ export const setOutputCollapsed = (collapsed: boolean) => update({ collapsed });
 export const setOutputVisible = (visible: boolean) => update({ visible });
 export const setOutputHeight = (height: number) => update({ height });
 
-export const useOutput = () =>
-  useSyncExternalStore(subscribe, () => state);
+export const useOutput = () => useSyncExternalStore(subscribe, () => state);

@@ -112,7 +112,10 @@ export function loadSettings(storage: HostStorage): SvnSettings {
 }
 
 export function applyFontScale(scale: number) {
-  document.documentElement.style.setProperty('--nonu-font-scale', String(scale));
+  document.documentElement.style.setProperty(
+    '--nonu-font-scale',
+    String(scale),
+  );
 }
 
 export function saveSettings(

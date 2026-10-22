@@ -48,12 +48,7 @@ export function ProjectLogView({
         onDiffModeChange={setMode}
         load={(query) => loadHistory(cwd, query, url)}
         loadRevisionFiles={(revision, path, action) =>
-          loadRevisionFiles(
-            cwd,
-            (rev) => target(path, rev),
-            revision,
-            action,
-          )
+          loadRevisionFiles(cwd, (rev) => target(path, rev), revision, action)
         }
         onLogFile={async (path, revision) =>
           setLog({
