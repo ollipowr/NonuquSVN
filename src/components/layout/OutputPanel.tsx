@@ -1,5 +1,5 @@
 import { t } from '@nonu/app/i18n';
-import { Button, ProgressBar, Splitter } from '@nonu/components';
+import { Button, Splitter } from '@nonu/components';
 import React from 'react';
 
 export type LogEntry = {
@@ -92,6 +92,9 @@ export function OutputPanel({
           <span className="material-symbols-outlined svn-output-chevron">
             {outputCollapsed ? 'chevron_right' : 'expand_more'}
           </span>
+          <span className="material-symbols-outlined svn-output-icon">
+            terminal
+          </span>
           <span className="svn-output-title">{t('output') as string}</span>
           {outputCollapsed && outputLog.length > 0 && (
             <span
@@ -137,7 +140,6 @@ export function OutputPanel({
           </div>
         )}
       </div>
-      <ProgressBar active={busy} />
     </>
   );
 }

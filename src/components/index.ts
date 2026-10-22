@@ -3,6 +3,7 @@ export * from './dialogs/AuthDialog.js';
 export * from './dialogs/ConfirmDialog.js';
 export * from './dialogs/Dialog.js';
 export * from './layout/ActivityBar.js';
+export * from './layout/OutputDock.js';
 export * from './layout/OutputPanel.js';
 export * from './layout/ViewHeader.js';
 export * from './ui/Button.js';

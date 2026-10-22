@@ -2,7 +2,9 @@ import {
   ActivityBar,
   ContextMenu,
   type ContextMenuItem,
+  OutputDock,
   useNavExpanded,
+  useOutputToggleAction,
 } from '@nonu/components';
 import { Button } from '@nonu/components/ui/Button';
 import type { ShellRequest } from '@nonu/host/shellRequest';
@@ -267,6 +269,7 @@ function HomeShell({
   onViewChange: (view: WorkspaceViewId) => void;
   children: React.ReactNode;
 }) {
+  const outputToggle = useOutputToggleAction();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [themeMenu, setThemeMenu] = useState<{ x: number; y: number } | null>(
     null,
@@ -320,10 +323,14 @@ function HomeShell({
             active: settingsOpen,
             onClick: () => setSettingsOpen((value) => !value),
           },
+          outputToggle,
         ]}
       />
       <div className="svn-standalone-home-content" hidden={settingsOpen}>
-        {children}
+        <div className="svn-standalone-home-column">
+          {children}
+          <OutputDock storage={host.storage} />
+        </div>
       </div>
       {settingsOpen && (
         <SvnSettingsPanel host={host} onClose={() => setSettingsOpen(false)} />

@@ -20,7 +20,7 @@
   .svn-branches
 ):not(.svn-compare):not(.svn-log-view):not(.svn-repo):not(.svn-settings):not(
   .svn-context-menu
-):not(.svn-project-overview) {
+):not(.svn-project-overview):not(.svn-output-dock) {
   display: none !important;
 }
 

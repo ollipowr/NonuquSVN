@@ -2,13 +2,14 @@ import { t } from '@nonu/app/i18n';
 import {
   ActivityBar,
   AuthDialog,
+  OutputDock,
+  useOutputToggleAction,
   Button,
   ConfirmDialog,
   ContextMenu,
   type ContextMenuItem,
   Dialog,
   type LogEntry,
-  OutputPanel,
   Splitter,
   useListSelection,
   ViewHeader,
@@ -86,6 +87,11 @@ import {
   startGeneration,
   subscribe,
 } from '@nonu/utils';
+import {
+  appendOutput,
+  setOutputBusy,
+  setOutputCollapsed,
+} from '@nonu/stores/outputLog';
 import React, {
   useCallback,
   useEffect,
@@ -110,9 +116,6 @@ type DiffMode = 'unified' | 'split';
 
 const DIFF_MODE_KEY = 'svn.diffMode';
 const LIST_WIDTH_KEY = 'svn.listWidth';
-const OUTPUT_COLLAPSED_KEY = 'svn.outputCollapsed';
-const OUTPUT_HEIGHT_KEY = 'svn.outputHeight';
-const OUTPUT_DEFAULT_HEIGHT = 140;
 const COMMIT_HEIGHT_KEY = 'svn.commitHeight';
 const COMMIT_DEFAULT_HEIGHT = 100;
 
@@ -267,6 +270,7 @@ export function WorkspaceView({
   const [message, setMessage] = useState(snap?.message ?? '');
   const [settings, setSettings] = useState(() => loadSettings(host.storage));
   const [showSettings, setShowSettings] = useState(false);
+  const outputToggle = useOutputToggleAction();
   const [activeView, setActiveViewState] =
     useState<WorkspaceViewId>(initialView);
   useEffect(() => {
@@ -333,6 +337,7 @@ export function WorkspaceView({
     () => getJob(cwd)?.status === 'running',
   );
   const [busy, setBusy] = useState(false);
+  useEffect(() => setOutputBusy(busy), [busy]);
   const [pill, setPill] = useState<Pill>(null);
   const {
     confirmation: confirmDialog,
@@ -359,16 +364,9 @@ export function WorkspaceView({
   const [listWidth, setListWidth] = useState<number | null>(
     () => host.storage.get<number>(LIST_WIDTH_KEY) ?? null,
   );
-  const [outputCollapsed, setOutputCollapsed] = useState(
-    () => host.storage.get<boolean>(OUTPUT_COLLAPSED_KEY) ?? false,
-  );
-  const [outputHeight, setOutputHeight] = useState<number>(
-    () => host.storage.get<number>(OUTPUT_HEIGHT_KEY) ?? OUTPUT_DEFAULT_HEIGHT,
-  );
   const [commitHeight, setCommitHeight] = useState<number>(
     () => host.storage.get<number>(COMMIT_HEIGHT_KEY) ?? COMMIT_DEFAULT_HEIGHT,
   );
-  const [outputLog, setOutputLog] = useState<LogEntry[]>([]);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>(
     (snap?.filterStatus ?? savedView?.filterStatus ?? 'all') as FilterStatus,
   );
@@ -399,7 +397,6 @@ export function WorkspaceView({
   // stale WC revision that svn info reports until the next svn update.
   const committedRevRef = useRef<string | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
-  const outputBodyRef = useRef<HTMLDivElement | null>(null);
 
   const autoRefresh = settings.autoRefresh;
   const settingsRef = useRef(settings);
@@ -477,8 +474,7 @@ export function WorkspaceView({
       if (initial && job.status !== 'running' && job.acked) return;
       const entries = job.log.slice(genSeenRef.current);
       genSeenRef.current = job.log.length;
-      if (entries.length)
-        setOutputLog((prev) => [...prev, ...entries].slice(-200));
+      if (entries.length) appendOutput(...entries);
       setGenerating(job.status === 'running');
       if (job.status === 'done') {
         setMessage(loadSnapshot(cwd)?.message ?? '');
@@ -520,23 +516,6 @@ export function WorkspaceView({
       void host.storage.set(LIST_WIDTH_KEY, value);
     },
   });
-  const startOutputSplitterDrag = useResize({
-    start: (event) => {
-      const panel = event.currentTarget.closest('.svn-panel');
-      const startY = event.clientY;
-      return panel
-        ? {
-            value: (next) => outputHeight + startY - next.clientY,
-            min: 60,
-            max: () => panel.getBoundingClientRect().height - 180,
-          }
-        : null;
-    },
-    onChange: setOutputHeight,
-    onEnd: (value) => {
-      void host.storage.set(OUTPUT_HEIGHT_KEY, value);
-    },
-  });
   const startCommitSplitterDrag = useResize({
     start: (event) => {
       const panel = event.currentTarget.closest('.svn-panel');
@@ -555,16 +534,8 @@ export function WorkspaceView({
     },
   });
 
-  const toggleOutputCollapsed = () => {
-    setOutputCollapsed((prev) => {
-      const next = !prev;
-      void host.storage.set(OUTPUT_COLLAPSED_KEY, next);
-      return next;
-    });
-  };
-
   const appendLog = useCallback((entry: LogEntry) => {
-    setOutputLog((prev) => [...prev.slice(-199), entry]);
+    appendOutput(entry);
   }, []);
 
   // Optimistically remove paths from the list so they disappear immediately
@@ -1432,6 +1403,7 @@ export function WorkspaceView({
             active: showSettings,
             onClick: () => setShowSettings(true),
           },
+          outputToggle,
         ]}
         views={buildNavViews({
           hasWorkspace: true,
@@ -1618,16 +1590,6 @@ export function WorkspaceView({
                 setActiveView('changes');
               }}
             />
-            <OutputPanel
-              outputLog={outputLog}
-              outputHeight={outputHeight}
-              outputCollapsed={outputCollapsed}
-              busy={busy}
-              toggleOutputCollapsed={toggleOutputCollapsed}
-              onClear={() => setOutputLog([])}
-              startOutputSplitterDrag={startOutputSplitterDrag}
-              outputBodyRef={outputBodyRef}
-            />
           </div>
         )}
 
@@ -1812,19 +1774,7 @@ export function WorkspaceView({
           </Dialog>
         )}
 
-        {activeView !== 'merge' && activeView !== 'logs' && (
-          <OutputPanel
-            outputLog={outputLog}
-            outputHeight={outputHeight}
-            outputCollapsed={outputCollapsed}
-            busy={busy}
-            toggleOutputCollapsed={toggleOutputCollapsed}
-            onClear={() => setOutputLog([])}
-            startOutputSplitterDrag={startOutputSplitterDrag}
-            outputBodyRef={outputBodyRef}
-          />
-        )}
-
+        <OutputDock storage={host.storage} />
       </div>
     </div>
   );

@@ -49,6 +49,8 @@ export interface ActivityAction {
   icon: string;
   label: string;
   active?: boolean;
+  /** Draws a divider above this action. */
+  separator?: boolean;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -158,18 +160,20 @@ export function ActivityBar<Id extends string>({
       {footer && footer.length > 0 && (
         <div className="svn-ab-footer">
           {footer.map((a) => (
-            <button
-              key={a.id}
-              aria-label={a.label}
-              title={a.label}
-              className={`svn-ab-item${a.active ? ' svn-ab-item--active' : ''}`}
-              onClick={a.onClick}
-            >
-              <span className="material-symbols-outlined svn-ab-icon">
-                {a.icon}
-              </span>
-              <span className="svn-ab-label">{a.label}</span>
-            </button>
+            <React.Fragment key={a.id}>
+              {a.separator && <div className="svn-ab-sep" role="separator" />}
+              <button
+                aria-label={a.label}
+                title={a.label}
+                className={`svn-ab-item${a.active ? ' svn-ab-item--active' : ''}`}
+                onClick={a.onClick}
+              >
+                <span className="material-symbols-outlined svn-ab-icon">
+                  {a.icon}
+                </span>
+                <span className="svn-ab-label">{a.label}</span>
+              </button>
+            </React.Fragment>
           ))}
         </div>
       )}

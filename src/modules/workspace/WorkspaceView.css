@@ -214,11 +214,17 @@
 
 /* Terminal / log panel */
 
+.svn-output-dock {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
 .svn-output {
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--nonu-border);
-  background: var(--nonu-bg);
+  background: var(--nonu-bg-secondary);
   flex-shrink: 0;
   overflow: hidden;
   min-height: 0;
@@ -245,6 +251,12 @@
 }
 
 .svn-output-chevron {
+  font-size: var(--nonu-icon-sm);
+  color: var(--nonu-text-muted);
+  flex-shrink: 0;
+}
+
+.svn-output-icon {
   font-size: var(--nonu-icon-sm);
   color: var(--nonu-text-muted);
   flex-shrink: 0;
