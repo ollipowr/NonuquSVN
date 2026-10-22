@@ -149,6 +149,10 @@ const translations = {
     opAddDone: (n: number) => `${n} Datei(en) hinzugefügt (Add).`,
     opRevertDone: (n: number) => `${n} Datei(en) revertiert.`,
     opDeleteDone: (n: number) => `${n} Datei(en) zum SVN Delete vorgemerkt.`,
+    opUndoDelete: 'Löschen rückgängig',
+    opUndoDeleteDone: (n: number) =>
+      `${n} Datei(en) mit Änderungen wiederhergestellt.`,
+    undoDelete: 'Rückgängig',
     opDeleteLocalDone: (n: number) => `${n} lokale Datei(en) gelöscht.`,
     opResolveDone: (n: number) => `${n} Datei(en) resolved.`,
     opUpdateDone: 'Update des Arbeitsverzeichnisses abgeschlossen.',
@@ -171,7 +175,7 @@ const translations = {
     confirmDeleteLocal: (n: number) =>
       `${n} nicht versionierte Datei(en) lokal löschen? Diese werden dauerhaft von der Festplatte entfernt.`,
     confirmDeleteModified: (n: number) =>
-      `${n} Datei(en) haben ungespeicherte Änderungen. Bitte zuerst committen oder reverten, bevor du löschst. Trotzdem fortfahren?`,
+      `${n} Datei(en) haben ungespeicherte Änderungen. Sie werden aus der Arbeitskopie entfernt, bleiben aber bis zum Neustart der App über „Delete zurücknehmen“ wiederherstellbar. Trotzdem fortfahren?`,
     discardEditsConfirm:
       'Nicht gespeicherte Änderungen an der aktuellen Datei verwerfen?',
     unsavedChanges: 'Ungespeicherte Änderungen',
@@ -191,6 +195,7 @@ const translations = {
     ctxPreviewFile: 'Vorschau',
     ctxAdd: 'Add',
     ctxRevert: 'Revert',
+    ctxUndoDelete: 'Delete zurücknehmen',
     ctxDeleteLocal: 'Lokal löschen',
     ctxSvnDelete: 'SVN Delete',
     ctxDelete: 'Löschen',
@@ -867,6 +872,10 @@ const translations = {
     opAddDone: (n: number) => `Added ${n} file(s).`,
     opRevertDone: (n: number) => `Reverted ${n} file(s).`,
     opDeleteDone: (n: number) => `Scheduled ${n} file(s) for deletion.`,
+    opUndoDelete: 'Undo delete',
+    opUndoDeleteDone: (n: number) =>
+      `Restored ${n} file(s) with local changes.`,
+    undoDelete: 'Undo',
     opDeleteLocalDone: (n: number) => `Deleted ${n} local file(s).`,
     opResolveDone: (n: number) => `Resolved ${n} file(s).`,
     opUpdateDone: 'Working copy updated.',
@@ -889,7 +898,7 @@ const translations = {
     confirmDeleteLocal: (n: number) =>
       `Locally delete ${n} unversioned file(s)? This permanently removes them from disk.`,
     confirmDeleteModified: (n: number) =>
-      `${n} file(s) have unsaved changes. Consider committing or reverting before deleting. Continue anyway?`,
+      `${n} file(s) have unsaved changes. They will be removed from the working copy but can be restored via “Undo delete” until the app restarts. Continue anyway?`,
     discardEditsConfirm: 'Discard unsaved changes to the current file?',
     unsavedChanges: 'Unsaved changes',
     unsavedChangesMsg:
@@ -908,6 +917,7 @@ const translations = {
     ctxPreviewFile: 'Preview file',
     ctxAdd: 'Add',
     ctxRevert: 'Revert',
+    ctxUndoDelete: 'Undo delete',
     ctxDeleteLocal: 'Delete local',
     ctxSvnDelete: 'SVN Delete',
     ctxDelete: 'Delete',

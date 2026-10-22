@@ -17,6 +17,53 @@ import { useState } from 'react';
 
 import { hasConflictMarkers } from './conflicts.js';
 
+const psQuote = (value: string) => `'${value.replace(/'/g, "''")}'`;
+
+async function runPowershell(host: HostAdapter, script: string, cwd: string) {
+  const result = await host.exec(`powershell -NoProfile -Command "${script}"`, {
+    cwd,
+  });
+  if (result.exitCode !== 0) {
+    throw new Error(result.stderr.trim() || 'PowerShell failed.');
+  }
+  return result.stdout.trim();
+}
+
+const absPath = (cwd: string, path: string) =>
+  `${cwd.replace(/[\\/]+$/, '')}\\${path.replace(/\//g, '\\')}`;
+
+type UndoDelete = { backupDir: string; index: number };
+/** Edited files removed by a delete, keyed by working copy and path; kept until the app restarts. */
+const undoableDeletes = new Map<string, UndoDelete>();
+const undoKey = (cwd: string, path: string) => `${cwd}|${path}`;
+
+/** Copies edited files out of the working copy so an undo can put them back after revert.
+ * shortcut: backup folders stay in TEMP after undo or restart, upgrade: remove them when their last file is restored */
+async function backupFiles(paths: string[], cwd: string, host: HostAdapter) {
+  const copies = paths.map(
+    (p, i) =>
+      `Copy-Item -LiteralPath ${psQuote(absPath(cwd, p))} -Destination (Join-Path $d ${i}) -Force`,
+  );
+  return runPowershell(
+    host,
+    `$d = Join-Path $env:TEMP ('nonu-svn-undo-' + [guid]::NewGuid()); New-Item -ItemType Directory -Force -Path $d | Out-Null; ${copies.join('; ')}; $d`,
+    cwd,
+  );
+}
+
+async function restoreFile(
+  path: string,
+  { backupDir, index }: UndoDelete,
+  cwd: string,
+  host: HostAdapter,
+) {
+  await runPowershell(
+    host,
+    `Copy-Item -LiteralPath (Join-Path ${psQuote(backupDir)} ${index}) -Destination ${psQuote(absPath(cwd, path))} -Force`,
+    cwd,
+  );
+}
+
 export function useFileActions({
   cwd,
   changes,
@@ -77,31 +124,54 @@ export function useFileActions({
     });
   };
 
-  const onDelete = (paths: string[]) => {
+  const onDelete = async (paths: string[], modified: string[]) => {
     if (!cwd || paths.length === 0) return;
-    void showConfirm({
-      title: t('svnDelete') as string,
-      message: (t('confirmDelete') as (n: number) => string)(paths.length),
-      confirmLabel: t('svnDelete') as string,
-      cancelLabel: t('authCancel') as string,
-      danger: true,
-      icon: 'delete',
-      onConfirm: () => {
-        removeFromList(paths);
-        void run(t('opDelete') as string, async (credentials) => {
-          const { stdout } = await runSvn(
-            ['delete', '--depth', 'infinity', ...paths],
-            cwd!,
-            credentials,
-          );
-          return (
-            stdout.trim() ||
-            (t('opDeleteDone') as (n: number) => string)(paths.length)
-          );
-        });
+    removeFromList(paths);
+    let backupDir = '';
+    let summary = '';
+    await run(t('opDelete') as string, async (credentials) => {
+      if (modified.length > 0)
+        backupDir = await backupFiles(modified, cwd!, host);
+      const { stdout } = await runSvn(
+        ['delete', '--force', ...paths],
+        cwd!,
+        credentials,
+      );
+      summary =
+        stdout.trim() ||
+        (t('opDeleteDone') as (n: number) => string)(paths.length);
+      return summary;
+    });
+    if (!summary || !backupDir) return;
+    modified.forEach((p, index) =>
+      undoableDeletes.set(undoKey(cwd!, p), { backupDir, index }),
+    );
+    setPill({
+      kind: 'success',
+      text: summary,
+      action: {
+        label: t('undoDelete') as string,
+        onClick: () => onUndoDelete(paths),
       },
     });
   };
+
+  const onUndoDelete = (paths: string[]) => {
+    if (!cwd || paths.length === 0) return;
+    void run(t('opUndoDelete') as string, async (credentials) => {
+      await runSvn(['revert', ...paths], cwd!, credentials);
+      for (const p of paths) {
+        const entry = undoableDeletes.get(undoKey(cwd!, p));
+        if (!entry) continue;
+        await restoreFile(p, entry, cwd!, host);
+        undoableDeletes.delete(undoKey(cwd!, p));
+      }
+      return (t('opUndoDeleteDone') as (n: number) => string)(paths.length);
+    });
+  };
+
+  const hasUndoDelete = (path: string) =>
+    !!cwd && undoableDeletes.has(undoKey(cwd, path));
 
   const onDeleteLocal = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
@@ -148,24 +218,31 @@ export function useFileActions({
       ['modified', 'conflicted', 'replaced'].includes(c.status),
     );
     const proceed = () => {
-      if (versioned.length > 0) onDelete(versioned);
+      if (versioned.length > 0)
+        void onDelete(
+          versioned,
+          modified.map((c) => c.path),
+        );
       if (unversioned.length > 0) onDeleteLocal(unversioned);
     };
-    if (modified.length > 0) {
-      void showConfirm({
-        title: t('delete') as string,
-        message: (t('confirmDeleteModified') as (n: number) => string)(
-          modified.length,
-        ),
-        confirmLabel: t('delete') as string,
-        cancelLabel: t('authCancel') as string,
-        danger: true,
-        icon: 'warning',
-        onConfirm: proceed,
-      });
+    if (versioned.length === 0) {
+      proceed();
       return;
     }
-    proceed();
+    void showConfirm({
+      title: t('delete') as string,
+      message:
+        modified.length > 0
+          ? (t('confirmDeleteModified') as (n: number) => string)(
+              modified.length,
+            )
+          : (t('confirmDelete') as (n: number) => string)(versioned.length),
+      confirmLabel: t('delete') as string,
+      cancelLabel: t('authCancel') as string,
+      danger: true,
+      icon: modified.length > 0 ? 'warning' : 'delete',
+      onConfirm: proceed,
+    });
   };
 
   const onResolve = (paths: string[]) => {
@@ -367,6 +444,8 @@ export function useFileActions({
     onAdd,
     onRevert,
     onDeleteSmart,
+    onUndoDelete,
+    hasUndoDelete,
     onResolveAny,
     onLock,
     onUnlock,

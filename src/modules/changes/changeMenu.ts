@@ -10,6 +10,8 @@ type Actions = Pick<
   | 'onAdd'
   | 'onRevert'
   | 'onDeleteSmart'
+  | 'onUndoDelete'
+  | 'hasUndoDelete'
   | 'onLock'
   | 'onUnlock'
   | 'onBreakLock'
@@ -39,6 +41,8 @@ export function buildChangeMenu(
     onAdd,
     onRevert,
     onDeleteSmart,
+    onUndoDelete,
+    hasUndoDelete,
     onLock,
     onUnlock,
     onBreakLock,
@@ -192,6 +196,13 @@ export function buildChangeMenu(
         label: t('ctxAdd') as string,
         icon: 'add',
         onClick: () => onAdd([change.path]),
+      });
+    }
+    if (change.status === 'deleted' && hasUndoDelete(change.path)) {
+      items.push({
+        label: t('ctxUndoDelete') as string,
+        icon: 'restore',
+        onClick: () => onUndoDelete([change.path]),
       });
     }
     if (change.status !== 'unversioned') {

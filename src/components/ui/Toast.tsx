@@ -5,9 +5,12 @@ export type ToastNotice = {
   kind: 'info' | 'success' | 'error';
   text: string;
   subtitle?: string;
+  action?: { label: string; onClick: () => void };
 } | null;
 
 const AUTO_DISMISS_MS = 3000;
+// Long enough to reach an action button before the toast disappears.
+const ACTION_DISMISS_MS = 10000;
 
 interface ToastProps {
   notice: ToastNotice;
@@ -25,7 +28,10 @@ export function Toast({ notice, onDismiss, onErrorClick }: ToastProps) {
   };
   const startTimer = () => {
     if (!notice || notice.kind === 'error') return;
-    timerRef.current = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    timerRef.current = setTimeout(
+      onDismiss,
+      notice.action ? ACTION_DISMISS_MS : AUTO_DISMISS_MS,
+    );
   };
 
   useEffect(() => {
@@ -50,6 +56,15 @@ export function Toast({ notice, onDismiss, onErrorClick }: ToastProps) {
           <span className="svn-toast-subtitle">{notice.subtitle}</span>
         )}
       </div>
+      {notice.action && (
+        <button
+          type="button"
+          className="svn-toast-action"
+          onClick={notice.action.onClick}
+        >
+          {notice.action.label}
+        </button>
+      )}
       {notice.kind === 'error' && (
         <button
           type="button"

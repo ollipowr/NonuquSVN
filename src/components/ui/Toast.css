@@ -33,6 +33,17 @@
   white-space: nowrap;
 }
 
+.svn-toast-action {
+  flex-shrink: 0;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--nonu-primary);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .svn-toast-subtitle {
   color: var(--nonu-text-muted);
   white-space: pre-wrap;

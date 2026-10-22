@@ -16,6 +16,7 @@ export type OperationNotice = {
   subtitle?: string;
   command?: string;
   stderr?: string;
+  action?: { label: string; onClick: () => void };
 } | null;
 /** Lets a long operation write intermediate lines to the output panel. */
 export type OperationLog = (entry: LogEntry) => void;
