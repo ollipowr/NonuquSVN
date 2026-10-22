@@ -5,7 +5,7 @@
 <h1 align="center">NonuquSVN</h1>
 
 <p align="center">
-  <strong>A modern Subversion client for Windows. Because it's never too late for a new one.</strong>
+  <strong>A modern Subversion client for Windows with a Git-like feel. Because it's never too late for a new one.</strong>
 </p>
 
 <p align="center">
@@ -19,6 +19,17 @@
 From the Latin *nonnumquam*, literally "not never", which means "sometimes". Shortened to **nonuqu**, it follows the motto *never say never*.
 
 Subversion may be quieter than Git these days, but it is still going strong in many teams, and it deserves a client that feels good to use.
+
+## Git-like, on top of Subversion
+
+Subversion is solid, but its tooling often feels dated. NonuquSVN brings the workflow people know from Git clients to SVN:
+
+- **Review before you commit:** inspect every change in a diff, then commit from the same view
+- **Branches as a first-class thing:** switch between branches and merge them with a guided workflow instead of the command line
+- **One place for everything:** projects, branches, and working copies live together on a start page
+- **Readable history:** log and blame you can actually scan
+
+Your repository stays plain Subversion.
 
 ## Features
 
