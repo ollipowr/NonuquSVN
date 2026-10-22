@@ -1,8 +1,12 @@
 .svn-file-change-indicator {
   display: inline-block;
-  min-width: 1ch;
-  font: 700 var(--nonu-text-xs) / 1 var(--nonu-font-mono, monospace);
-  text-align: center;
+  font-size: var(--nonu-icon-md);
+  line-height: 1;
+}
+.svn-file-change-glyph {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
 .svn-file-change-indicator--added {
   color: var(--nonu-success);
