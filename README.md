@@ -29,6 +29,10 @@ Subversion is solid, but its tooling often feels dated. NonuquSVN brings the wor
 
 Your repository stays plain Subversion.
 
+<p align="center">
+  <img src="assets/log-diff-dark-coffee.png" alt="NonuquSVN log view with a commit's changed files and a diff in the Dark Coffee theme" width="100%">
+</p>
+
 ## Features
 
 - **Changes:** review local changes with side-by-side diffs and commit right away
