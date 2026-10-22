@@ -85,8 +85,13 @@ export function useChangesModel({
     return out;
   }, [folderGroups, collapsedFolders]);
 
+  // Same set the header counts, collapsed folders included.
+  const filteredPaths = useMemo(
+    () => filteredAndSorted.map((c) => c.path),
+    [filteredAndSorted],
+  );
   const allSelected =
-    visiblePaths.length > 0 && visiblePaths.every((p) => selected.has(p));
+    filteredPaths.length > 0 && filteredPaths.every((p) => selected.has(p));
 
   // Bulk actions and commit act only on selected files the active filter shows.
   // Selected-but-filtered-out files stay selected and are never committed or reverted silently.
@@ -98,6 +103,7 @@ export function useChangesModel({
 
   return {
     filteredAndSorted,
+    filteredPaths,
     folderGroups,
     visiblePaths,
     allSelected,

@@ -15,7 +15,7 @@ let state: OutputState = {
   entries: [],
   busy: false,
   collapsed: false,
-  visible: true,
+  visible: false,
   height: 140,
 };
 const listeners = new Set<() => void>();

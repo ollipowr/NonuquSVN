@@ -9,7 +9,7 @@ const NAV_EXPANDED_EVENT = 'nonuqu:navigation-expanded';
 /** Navigation expanded state, shared by the title-bar toggle and every ActivityBar. */
 export function useNavExpanded(storage?: HostStorage) {
   const [expanded, setExpanded] = useState(
-    () => storage?.getGlobal<boolean>(NAV_EXPANDED_KEY) !== false,
+    () => storage?.getGlobal<boolean>(NAV_EXPANDED_KEY) === true,
   );
   const [error, setError] = useState('');
   useEffect(() => {

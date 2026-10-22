@@ -68,10 +68,10 @@
   width: 30px;
   height: 30px;
   flex: none;
-  background: var(--nonu-text);
-  mask: url("../../../build-resources/logo.svg") center / 24px no-repeat;
-  -webkit-mask:
-    url("../../../build-resources/logo.svg") center / 24px no-repeat;
+  color: var(--nonu-bg);
+}
+.svn-home-logo-tile {
+  fill: var(--nonu-primary);
 }
 .svn-home-brand-suffix {
   color: var(--nonu-primary);

@@ -25,7 +25,7 @@ export function OutputDock({ storage }: { storage: HostStorage }) {
 
   useEffect(() => {
     setOutputCollapsed(storage.get<boolean>(OUTPUT_COLLAPSED_KEY) ?? false);
-    setOutputVisible(storage.get<boolean>(OUTPUT_VISIBLE_KEY) ?? true);
+    setOutputVisible(storage.get<boolean>(OUTPUT_VISIBLE_KEY) ?? false);
     setOutputHeight(
       storage.get<number>(OUTPUT_HEIGHT_KEY) ?? OUTPUT_DEFAULT_HEIGHT,
     );

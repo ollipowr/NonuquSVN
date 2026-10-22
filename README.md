@@ -26,8 +26,6 @@ Subversion is solid, but its tooling often feels dated. NonuquSVN brings the wor
 
 - **Review before you commit:** inspect every change in a diff, then commit from the same view
 - **Branches as a first-class thing:** switch between branches and merge them with a guided workflow instead of the command line
-- **One place for everything:** projects, branches, and working copies live together on a start page
-- **Readable history:** log and blame you can actually scan
 
 Your repository stays plain Subversion.
 
@@ -70,7 +68,7 @@ npm run dev
 
 `npm run dist` also builds the native Explorer extension, which needs Visual Studio Build Tools
 (Desktop development with C++) and PowerShell. See
-[`build-resources/shell-extension`](build-resources/shell-extension/README.md).
+`build-resources/shell-extension`.
 
 ## License
 

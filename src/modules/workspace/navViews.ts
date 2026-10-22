@@ -1,12 +1,10 @@
 import { t } from '@nonu/app/i18n';
 import type { ActivityView } from '@nonu/components/layout/ActivityBar';
 import type { WorkspaceViewId } from './WorkspaceView.js';
-export type NavViewId = 'start' | WorkspaceViewId;
 export function buildNavViews(o: {
   hasWorkspace: boolean;
-  activeView?: NavViewId;
   changesCount: number;
-}): ActivityView<NavViewId>[] {
+}): ActivityView<WorkspaceViewId>[] {
   const disabledTitle = t('navNeedWorkspace') as string;
   return [
     {

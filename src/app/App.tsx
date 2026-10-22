@@ -256,7 +256,7 @@ function HomeShell({
   hasWorkspace,
   hasProject,
   activeView,
-  onHome,
+  noneActive,
   onViewChange,
   children,
 }: {
@@ -264,8 +264,8 @@ function HomeShell({
   themeItems: ContextMenuItem[];
   hasWorkspace: boolean;
   hasProject: boolean;
-  activeView: 'start' | WorkspaceViewId;
-  onHome: () => void;
+  activeView: WorkspaceViewId;
+  noneActive: boolean;
   onViewChange: (view: WorkspaceViewId) => void;
   children: React.ReactNode;
 }) {
@@ -298,14 +298,11 @@ function HomeShell({
           .pop()}
         views={buildNavViews({
           hasWorkspace,
-          activeView,
           changesCount,
         })}
         active={activeView}
-        onChange={(view) => {
-          if (view === 'start') onHome();
-          else onViewChange(view);
-        }}
+        noneActive={noneActive}
+        onChange={onViewChange}
         footer={[
           {
             id: 'theme',
@@ -567,12 +564,12 @@ export function App({ adapter }: { adapter: HostAdapter }) {
   const edit = (cmd: string) => () => {
     document.execCommand(cmd);
   };
-  const goStart = (showCheckout: boolean) => () =>
+  const openCheckout = () =>
     guard(() => {
       setCheckoutRepositoryUrl('');
       setShowHome(true);
       setShellViewRequest(undefined);
-      setCheckout(showCheckout);
+      setCheckout(true);
     });
   const navigate = (view: WorkspaceViewId, path?: string) => {
     const fallback =
@@ -639,8 +636,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
           label: t('menuOpenWorkingCopy'),
           onClick: () => void chooseFolder(),
         },
-        { label: t('menuCheckout'), onClick: goStart(true) },
-        { label: t('menuStartPage'), onClick: goStart(false) },
+        { label: t('menuCheckout'), onClick: openCheckout },
         'sep',
         {
           label: t('menuQuit'),
@@ -717,14 +713,13 @@ export function App({ adapter }: { adapter: HostAdapter }) {
                 ? {
                     ...chrome,
                     projectLevel: true,
-                    openHome: goStart(false),
                     openWorkingCopy: () => navigate('changes'),
                   }
                 : chrome
             }
             switching={switchingWorkspace}
             storage={adapter.storage}
-            onAddProject={goStart(true)}
+            onAddProject={openCheckout}
             onOpenWorkingCopy={() => void chooseFolder()}
             singleProject={singleProject}
           />
@@ -732,7 +727,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
           <WorkspaceBar
             workspace=""
             storage={adapter.storage}
-            onAddProject={goStart(true)}
+            onAddProject={openCheckout}
             onOpenWorkingCopy={() => void chooseFolder()}
             singleProject={singleProject}
           />
@@ -742,29 +737,16 @@ export function App({ adapter }: { adapter: HostAdapter }) {
           themeItems={workspaceThemeItems}
           hasWorkspace={!!workspacePath}
           hasProject={!!activeProject}
-          activeView={showHome || checkout ? 'start' : workspaceView}
-          onHome={goStart(false)}
+          activeView={workspaceView}
+          noneActive={showHome || checkout}
           onViewChange={navigate}
         >
-          {!showHome &&
-          !checkout &&
-          workspaceView === 'projectLogs' &&
-          activeProject?.repositoryUrl ? (
-            <ProjectLogView host={adapter} url={activeProject.repositoryUrl} />
-          ) : !showHome && !checkout && workspaceView === 'repo' ? (
-            <RepoBrowserTab
-              cwd={adapter.workspacePath || '.'}
-              url={workingCopyUrl}
-            />
-          ) : (
+          {checkout || (!workspacePath && !projectStore.projects.length) ? (
             <StartPage
               storage={adapter.storage}
               open={open}
               chooseFolder={() => window.svnHost.chooseFolder()}
-              onCheckout={() => {
-                setCheckoutRepositoryUrl('');
-                setCheckout(true);
-              }}
+              onCheckout={openCheckout}
             >
               {checkout && (
                 <CheckoutDialog
@@ -778,7 +760,16 @@ export function App({ adapter }: { adapter: HostAdapter }) {
                 />
               )}
             </StartPage>
-          )}
+          ) : !showHome &&
+            workspaceView === 'projectLogs' &&
+            activeProject?.repositoryUrl ? (
+            <ProjectLogView host={adapter} url={activeProject.repositoryUrl} />
+          ) : !showHome && workspaceView === 'repo' ? (
+            <RepoBrowserTab
+              cwd={adapter.workspacePath || '.'}
+              url={workingCopyUrl}
+            />
+          ) : null}
         </HomeShell>
       </>
     );
@@ -793,7 +784,7 @@ export function App({ adapter }: { adapter: HostAdapter }) {
         chrome={chrome}
         switching={switchingWorkspace}
         storage={adapter.storage}
-        onAddProject={goStart(true)}
+        onAddProject={openCheckout}
         onOpenWorkingCopy={() => void chooseFolder()}
         singleProject={singleProject}
       />
@@ -803,7 +794,6 @@ export function App({ adapter }: { adapter: HostAdapter }) {
           host={adapter}
           onChrome={handleChrome}
           themes={workspaceThemeItems}
-          onHome={goStart(false)}
           initialView={workspaceView}
           shellViewRequest={shellViewRequest}
           onViewChange={(view) => {
