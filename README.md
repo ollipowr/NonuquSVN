@@ -15,11 +15,11 @@
 </p>
 
 <p align="center">
-  <a href="assets/log-diff-dark-coffee.png">
-    <img src="assets/log-diff-dark-coffee.png" alt="NonuquSVN log view with a commit's changed files and a diff in the Dark Coffee theme" width="640">
+  <a href="assets/log-diff-dark.png">
+    <img src="assets/log-diff-dark.png" alt="NonuquSVN log view with a commit's changed files and a diff in the Dark theme" width="640">
   </a>
   <br>
-  <sub>Log view with changed files and diff (Dark Coffee theme). Click to enlarge.</sub>
+  <sub>Log view with changed files and diff (Dark theme). Click to enlarge.</sub>
 </p>
 
 ## Git-like, on top of Subversion
