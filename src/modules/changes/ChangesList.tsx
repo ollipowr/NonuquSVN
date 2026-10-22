@@ -10,6 +10,7 @@ import './ChangesList.css';
 
 type ChangesListProps = {
   groups: Map<string, SvnChange[]>;
+  rootName: string;
   groupByFolder: boolean;
   allVisibleChanges: SvnChange[];
   collapsedFolders: Set<string>;
@@ -74,6 +75,7 @@ function pathKey(path: string): string {
 function getFileIcon(path: string, directorySet: Set<string>): string {
   const cleanPath = path.replace(/[\\/]+$/, '');
   const name = cleanPath.split(/[\\/]/).pop()?.toLowerCase() ?? '';
+  if (cleanPath === '.') return 'folder_special';
   if (directorySet.has(pathKey(cleanPath))) return 'folder';
 
   const hasDot = name.includes('.');
@@ -329,7 +331,11 @@ export function ChangesList(props: ChangesListProps) {
               {getFileIcon(path, directorySet)}
             </span>
             <span className="svn-path" title={path}>
-              {props.groupByFolder ? (path.split(/[\\/]/).pop() ?? path) : path}
+              {path === '.'
+                ? props.rootName
+                : props.groupByFolder
+                  ? (path.split(/[\\/]/).pop() ?? path)
+                  : path}
               {change.lockedByMe && (
                 <span
                   className="material-symbols-outlined svn-lock-indicator"

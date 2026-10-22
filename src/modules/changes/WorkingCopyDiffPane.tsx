@@ -30,6 +30,7 @@ export function WorkingCopyDiffPane({
   doFormatAndSave,
   editorRef,
   cwd,
+  rootName,
   editable,
   mtimes,
   activeStatus,
@@ -38,6 +39,7 @@ export function WorkingCopyDiffPane({
   readOnlyDiffRef,
   diff,
 }: {
+  rootName: string;
   active: string | null;
   activeChange?: SvnChange;
   diffIsNewFile: boolean;
@@ -64,7 +66,7 @@ export function WorkingCopyDiffPane({
 
   return (
     <div className="svn-diff">
-      <DiffHeader path={active}>
+      <DiffHeader path={active} rootName={rootName}>
         {activeChange && (
           <span className={`svn-badge svn-badge--${activeChange.status}`}>
             {diffIsNewFile ? (t('newFile') as string) : activeChange.status}

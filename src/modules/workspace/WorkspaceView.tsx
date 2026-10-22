@@ -720,11 +720,14 @@ export function WorkspaceView({
   }, [cwd, changes, host]);
 
   // Load the focused file's diff. Cached diffs show at once and revalidate after refresh; unversioned files show raw content.
-  const activeStatus = changes.find((c) => c.path === active)?.status;
+  const rootName = cwd.replace(/[\\/]+$/, '').split(/[\\/]/).pop() ?? cwd;
+  const activeEntry = changes.find((c) => c.path === active);
+  const activeStatus = activeEntry?.status;
   const { diff, setDiff, diffIsNewFile } = useWorkingCopyDiff({
     cwd,
     active,
     activeStatus,
+    propsOnly: activeEntry?.propsOnly,
     refreshTick,
     hasLoaded,
     initialDiff,
@@ -786,7 +789,8 @@ export function WorkspaceView({
     !!active &&
     !!activeChange &&
     !['deleted', 'missing'].includes(activeChange.status) &&
-    ['modified', 'unversioned', 'conflicted'].includes(activeChange.status);
+    ['modified', 'unversioned', 'conflicted'].includes(activeChange.status) &&
+    !activeChange.propsOnly;
   const toggle = (path: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -1447,6 +1451,7 @@ export function WorkspaceView({
               }}
               list={{
                 groups: folderGroups,
+                rootName: rootName,
                 groupByFolder: groupByFolder,
                 allVisibleChanges: filteredAndSorted,
                 collapsedFolders: collapsedFolders,
@@ -1504,6 +1509,7 @@ export function WorkspaceView({
             doFormatAndSave={doFormatAndSave}
             editorRef={editorRef}
             cwd={cwd}
+            rootName={rootName}
             editable={editable}
             mtimes={mtimes}
             activeStatus={activeStatus}

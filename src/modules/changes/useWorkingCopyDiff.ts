@@ -5,10 +5,30 @@ import { type RefObject, useEffect, useState } from 'react';
 
 export const diffCacheEntryKey = (path: string, status?: string) =>
   `${status ?? ''}:${path}`;
+
+/** One line per merge source, so changed revision lists show per path like TortoiseSVN. */
+export function mergeinfoDiff(oldValue: string, newValue: string): string {
+  const oldLines = oldValue.split(/\r?\n/).filter(Boolean);
+  const newLines = newValue.split(/\r?\n/).filter(Boolean);
+  const oldSet = new Set(oldLines);
+  const newSet = new Set(newLines);
+  const body = [
+    ...newLines.filter((l) => oldSet.has(l)).map((l) => ` ${l}`),
+    ...oldLines.filter((l) => !newSet.has(l)).map((l) => `-${l}`),
+    ...newLines.filter((l) => !oldSet.has(l)).map((l) => `+${l}`),
+  ];
+  if (body.every((l) => l.startsWith(' '))) return '';
+  return [
+    `@@ -1,${oldLines.length} +1,${newLines.length} @@`,
+    ...body,
+  ].join('\n');
+}
+
 export function useWorkingCopyDiff({
   cwd,
   active,
   activeStatus,
+  propsOnly,
   refreshTick,
   hasLoaded,
   initialDiff,
@@ -17,6 +37,7 @@ export function useWorkingCopyDiff({
   cwd: string;
   active: string | null;
   activeStatus?: string;
+  propsOnly?: boolean;
   refreshTick: number;
   hasLoaded: boolean;
   initialDiff?: DiffCacheEntry;
@@ -56,6 +77,17 @@ export function useWorkingCopyDiff({
           store((await readFileRaw(active, cwd)) || t('diffEmptyFile'), true);
           return;
         }
+        if (propsOnly) {
+          const [before, after] = await Promise.all([
+            runSvn(['propget', 'svn:mergeinfo', '-r', 'BASE', active], cwd),
+            runSvn(['propget', 'svn:mergeinfo', active], cwd),
+          ]);
+          const merged = mergeinfoDiff(before.stdout, after.stdout);
+          if (merged) {
+            store(merged, false);
+            return;
+          }
+        }
         const { stdout } = await runSvn(['diff', active], cwd);
         store(
           stdout.trim() ||
@@ -72,7 +104,7 @@ export function useWorkingCopyDiff({
     return () => {
       cancelled = true;
     };
-  }, [cwd, active, activeStatus, refreshTick, hasLoaded]);
+  }, [cwd, active, activeStatus, propsOnly, refreshTick, hasLoaded]);
 
   return { diff, setDiff, diffIsNewFile };
 }

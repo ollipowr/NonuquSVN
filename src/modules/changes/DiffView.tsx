@@ -21,21 +21,31 @@ export function DiffHeader({
   children,
   readOnly = false,
   emptyLabel = t('selectFileForDiff') as string,
+  rootName,
 }: {
   path: string | null;
   children?: React.ReactNode;
   readOnly?: boolean;
   emptyLabel?: string;
+  rootName?: string;
 }) {
   return (
     <div className="svn-diff-head">
       <span className="svn-diff-head-text" title={path ?? undefined}>
         {path ? (
           <>
-            <span className="svn-crumb-name">{path.split(/[\\/]/).pop()}</span>
-            <span className="svn-crumb-dir">
-              {path.replace(/[\\/]?[^\\/]*$/, '')}
-            </span>
+            {path === '.' ? (
+              <span className="svn-crumb-name">{rootName ?? path}</span>
+            ) : (
+              <>
+                <span className="svn-crumb-name">
+                  {path.split(/[\\/]/).pop()}
+                </span>
+                <span className="svn-crumb-dir">
+                  {path.replace(/[\\/]?[^\\/]*$/, '')}
+                </span>
+              </>
+            )}
           </>
         ) : (
           emptyLabel

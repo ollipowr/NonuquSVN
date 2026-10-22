@@ -324,6 +324,8 @@ export interface SvnChange {
   treeConflict?: boolean;
   /** Locked by the current user (column 6 is `K`). Locks held by others need a server round trip and are not surfaced. */
   lockedByMe?: boolean;
+  /** Only properties changed (column 2 `M`); there is no file content to edit. */
+  propsOnly?: boolean;
   /** Resolved URL of an `svn:externals` entry; undefined when not an external or the lookup failed. */
   externalTarget?: string;
 }
@@ -358,7 +360,9 @@ export function parseSvnStatus(
     if (line.startsWith('---') || line.startsWith('Status against revision'))
       continue;
     if (line.startsWith('Performing status on external item')) continue;
-    const code = line[0];
+    // Column 2 `M` alone is a property change (e.g. svn:mergeinfo on a merged folder); it must commit with its folder.
+    const propsOnly = line[0] === ' ' && line[1] === 'M';
+    const code = propsOnly ? 'M' : line[0];
     const treeConflict = line[6] === 'C';
     // Column 6 is the lock marker: `K` means locked by the current user.
     const lockedByMe = line[5] === 'K';
@@ -383,6 +387,7 @@ export function parseSvnStatus(
         status !== 'external',
       ...(treeConflict ? { treeConflict: true } : {}),
       ...(lockedByMe ? { lockedByMe: true } : {}),
+      ...(propsOnly ? { propsOnly: true } : {}),
     });
   }
   return changes;
