@@ -573,6 +573,16 @@ export function WorkspaceView({
     [setActive],
   );
 
+  const patchList = useCallback(
+    (paths: string[], patch: Partial<SvnChange>) => {
+      const touched = new Set(paths);
+      setChanges((prev) =>
+        prev.map((c) => (touched.has(c.path) ? { ...c, ...patch } : c)),
+      );
+    },
+    [],
+  );
+
   /** Re-reads status. With a cached snapshot this runs silently; concurrent calls share one run. */
   const refresh = useCallback(
     async (force = true) => {
@@ -1123,6 +1133,7 @@ export function WorkspaceView({
     run,
     showConfirm,
     removeFromList,
+    patchList,
     setPill,
   });
 

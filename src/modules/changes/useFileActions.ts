@@ -31,6 +31,7 @@ export function useFileActions({
   run,
   showConfirm,
   removeFromList,
+  patchList,
   setPill,
 }: {
   cwd: string;
@@ -42,10 +43,13 @@ export function useFileActions({
   ) => Promise<void>;
   showConfirm: ReturnType<typeof useConfirmation>['show'];
   removeFromList: (paths: string[]) => void;
+  patchList: (paths: string[], patch: Partial<SvnChange>) => void;
   setPill: (notice: OperationNotice) => void;
 }) {
+  // Optimistic updates: the list changes at once; the status refresh in `run` corrects it on failure.
   const onAdd = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
+    patchList(paths, { status: 'added', code: 'A', committable: true });
     void run(t('opAdd') as string, async (credentials) => {
       const { stdout } = await runSvn(
         ['add', '--depth', 'infinity', ...paths],
@@ -240,6 +244,7 @@ export function useFileActions({
 
   const onResolve = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
+    patchList(paths, { status: 'modified', code: 'M', committable: true });
     void run(t('opResolve') as string, async (credentials) => {
       // `svn resolve` only clears the conflict state; it does not touch the file content.
       // Refuse while conflict markers are still in the file, otherwise they get committed.
@@ -270,6 +275,7 @@ export function useFileActions({
   const onResolveTreeConflictKeepMine = (path: string) => {
     if (!cwd) return;
     setTreeConflictChoice(null);
+    patchList([path], { status: 'modified', code: 'M', treeConflict: false });
     void run(t('opResolve') as string, async (credentials) => {
       const { stdout, snapshotId } = await runSvn(
         ['resolve', '--accept', 'working', path],
@@ -312,6 +318,7 @@ export function useFileActions({
 
   const onLock = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
+    patchList(paths, { lockedByMe: true });
     void run(t('opLock') as string, async (credentials) => {
       const stdout = await lockFiles(paths, cwd, credentials);
       return (
@@ -323,6 +330,7 @@ export function useFileActions({
 
   const onUnlock = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
+    patchList(paths, { lockedByMe: false });
     void run(t('opUnlock') as string, async (credentials) => {
       const stdout = await unlockFiles(paths, cwd, credentials);
       return (
@@ -375,6 +383,7 @@ export function useFileActions({
     const parent = slash === -1 ? '.' : path.slice(0, slash);
     const name = slash === -1 ? path : path.slice(slash + 1);
     const pattern = isFolder && recursive ? `${name}/*` : name;
+    removeFromList([path]);
     void run(t('opAddToIgnore') as string, async (credentials) => {
       const { stdout: existing } = await runSvn(
         ['propget', 'svn:ignore', parent],
@@ -415,6 +424,7 @@ export function useFileActions({
       parentMap.get(parent)!.add(pattern);
     }
 
+    removeFromList(paths);
     void run(
       (t('opAddToIgnore') as string) + ` (${paths.length})`,
       async (credentials) => {
