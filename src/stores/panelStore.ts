@@ -194,13 +194,27 @@ export async function readEditableFile(
       : unversioned
         ? Promise.resolve(decodeBase64Bytes(''))
         : svnCatDecoded(path, cwd).catch(() => decodeBase64Bytes('')),
-    readFileDecoded(path, cwd).catch(
-      (): DecodedFile => ({ text: '', encoding: 'utf8', bom: false }),
-    ),
+    workingCopyForDiff(path, cwd),
   ]);
   editableBaseCache.set(key, base);
   editableWorkCache.set(key, { version, work });
   return { base, work };
+}
+
+/** Folders have no content to diff; skipping the read keeps the host from logging EISDIR. */
+async function workingCopyForDiff(
+  path: string,
+  cwd: string,
+): Promise<DecodedFile> {
+  const empty = decodeBase64Bytes('');
+  if (_host) {
+    const check = await _host.exec(
+      `powershell -NoProfile -Command "Test-Path -LiteralPath ${psq(`${cwd}/${path}`)} -PathType Container"`,
+      { cwd, timeout: 5000 },
+    );
+    if (check.stdout.trim().toLowerCase() === 'true') return empty;
+  }
+  return readFileDecoded(path, cwd).catch(() => empty);
 }
 
 /** Runs a PowerShell script (passed as -EncodedCommand to dodge all quoting) and returns stdout. */

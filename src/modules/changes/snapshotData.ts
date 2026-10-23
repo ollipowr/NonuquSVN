@@ -47,7 +47,10 @@ export async function loadSnapshotDiff(
     (await host.readSnapshotFile?.(snapshotId, path)) ?? null,
   );
   const work = bytesOf(
-    await host.readFileBase64(`${cwd}/${path}`).catch(() => null),
+    await host.readFileBase64(`${cwd}/${path}`).catch((err: unknown) => {
+      if (err instanceof Error && err.message.includes('ENOENT')) return null;
+      throw err;
+    }),
   );
   const binary = [base, work].some((bytes) =>
     bytes.subarray(0, BINARY_PROBE_BYTES).includes(0),
