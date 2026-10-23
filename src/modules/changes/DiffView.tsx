@@ -60,7 +60,7 @@ export function DiffHeader({
   path,
   children,
   readOnly = false,
-  emptyLabel = t('selectFileForDiff') as string,
+  emptyLabel = '',
   rootName,
 }: {
   path: string | null;
