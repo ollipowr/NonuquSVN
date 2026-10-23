@@ -1,4 +1,14 @@
-import type { HostAdapter, HostStorage, ExecOptions, ExecResult } from '../src/host/types.js';
+import type {
+  HostAdapter,
+  HostStorage,
+  ExecOptions,
+  ExecResult,
+  RestoreMode,
+  RestoreResult,
+  SnapshotEntryInput,
+  SnapshotFileInput,
+  SnapshotRecord,
+} from '../src/host/types.js';
 
 declare global {
   interface Window {
@@ -29,6 +39,10 @@ declare global {
       setTitleBarTheme(color: string, symbolColor: string): Promise<void>;
       appIconUrl(): string;
       devClearStorage(): Promise<void>;
+      snapshotSave(entry: SnapshotEntryInput, files: SnapshotFileInput[]): Promise<SnapshotRecord>;
+      snapshotList(workspace: string): Promise<SnapshotRecord[]>;
+      snapshotRestore(id: string, files: string[], mode: RestoreMode): Promise<RestoreResult>;
+      snapshotReadFile(id: string, path: string): Promise<string | null>;
     };
   }
 }
@@ -85,6 +99,11 @@ export function createElectronAdapter(): HostAdapter {
     },
 
     chooseFolder: () => window.svnHost.chooseFolder(),
+
+    snapshot: (entry, files) => window.svnHost.snapshotSave(entry, files),
+    listSnapshots: workspace => window.svnHost.snapshotList(workspace),
+    restoreSnapshot: (id, files, mode) => window.svnHost.snapshotRestore(id, files, mode),
+    readSnapshotFile: (id, path) => window.svnHost.snapshotReadFile(id, path),
 
     ai: null,
   };

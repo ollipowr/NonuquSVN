@@ -23,15 +23,17 @@ import {
   buildChangeMenu,
   ChangesView,
   CommitComposer,
-  type DiffViewHandle,
+  type DiffPanelHandle,
   diffCacheEntryKey,
-  type EditableDiffHandle,
   type EditableDiffState,
+  FileVersionsDialog,
   type FilterStatus,
   folderGroupChange,
   loadView,
+  ReflogView,
   type SortBy,
   saveView,
+  undoOperation,
   useChangesModel,
   useFileActions,
   useWorkingCopyDiff,
@@ -82,6 +84,7 @@ import {
   type SvnChange,
   type SvnLogEntry,
   type SvnRepoInfo,
+  setSnapshotGate,
   toOperationNotice as toPill,
   useSvnOperation,
 } from '@nonu/svn';
@@ -150,6 +153,7 @@ export type WorkspaceViewId =
   | 'projectLogs'
   | 'logs'
   | 'merge'
+  | 'reflog'
   | 'repo';
 
 export function WorkspaceView({
@@ -223,8 +227,7 @@ export function WorkspaceView({
     error: null,
     externalChanged: false,
   });
-  const readOnlyDiffRef = useRef<DiffViewHandle | null>(null);
-  const editorRef = useRef<EditableDiffHandle | null>(null);
+  const diffRef = useRef<DiffPanelHandle | null>(null);
   const dirtyRef = useRef(false);
   dirtyRef.current = editState.dirty;
   // Leaving the editor (file, view, commit) with unsaved edits asks save/discard first.
@@ -239,11 +242,11 @@ export function WorkspaceView({
       icon: 'warning',
       confirmIcon: 'save',
       onConfirm: async () => {
-        const saved = (await editorRef.current?.save()) ?? true;
+        const saved = (await diffRef.current?.save()) ?? true;
         if (saved) proceed();
       },
       onExtra: () => {
-        editorRef.current?.revert();
+        diffRef.current?.revert();
         proceed();
       },
     });
@@ -349,6 +352,7 @@ export function WorkspaceView({
     close: closeMenu,
   } = useContextMenu<{ items: ContextMenuItem[]; target: string | null }>();
   const menuTarget = menu?.data.target ?? null;
+  const [versionsPath, setVersionsPath] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<{
     path: string;
     entries: SvnLogEntry[];
@@ -495,6 +499,25 @@ export function WorkspaceView({
   useEffect(() => {
     setPanelHost(host);
   }, [host]);
+
+  useEffect(() => {
+    setSnapshotGate(
+      (unreadable) =>
+        new Promise((resolve) =>
+          showConfirm({
+            title: t('snapshotGapTitle') as string,
+            message: (t('snapshotGapMsg') as (p: string) => string)(
+              unreadable.join(', '),
+            ),
+            confirmLabel: t('snapshotGapConfirm') as string,
+            cancelLabel: t('authCancel') as string,
+            danger: true,
+            onConfirm: () => resolve(true),
+            onDismiss: () => resolve(false),
+          }),
+        ),
+    );
+  }, [showConfirm]);
 
   const startSplitterDrag = useResize({
     start: () => {
@@ -719,6 +742,21 @@ export function WorkspaceView({
     };
   }, [cwd, changes, host]);
 
+  const baseRevision = repo?.revision;
+  const [baseEntry, setBaseEntry] = useState<SvnLogEntry>();
+  useEffect(() => {
+    if (!cwd || !baseRevision) return;
+    let cancelled = false;
+    loadHistory(cwd, { revision: baseRevision, limit: 1 })
+      .then(([entry]) => {
+        if (!cancelled) setBaseEntry(entry);
+      })
+      .catch((err) => console.warn('[svn] base revision fetch failed:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [cwd, baseRevision]);
+
   // Load the focused file's diff. Cached diffs show at once and revalidate after refresh; unversioned files show raw content.
   const rootName =
     cwd
@@ -785,6 +823,14 @@ export function WorkspaceView({
       setPill,
       appendLog,
       refresh: refreshAfterOperation,
+      onUndo: (snapshotId) =>
+        void undoOperation({
+          host,
+          cwd,
+          snapshotId,
+          show: showConfirm,
+          setPill,
+        }),
     });
 
   const activeChange = changes.find((c) => c.path === active);
@@ -1007,11 +1053,11 @@ export function WorkspaceView({
   const doFormatFile = () => {
     if (!cwd || !active || !activeFormatterRule) return;
     const rule = activeFormatterRule;
-    const editor = editorRef.current;
-    if (editor) {
+    const diff = diffRef.current;
+    if (diff?.editable()) {
       // Format in place: run() would refresh from disk and discard the editor state.
       setBusy(true);
-      editor
+      diff
         .formatInPlace(async (filePath) => {
           await runFormatterRules([rule], [filePath], host);
         })
@@ -1030,13 +1076,13 @@ export function WorkspaceView({
   const doFormatAndSave = () => {
     if (!cwd || !active || !activeFormatterRule) return;
     const rule = activeFormatterRule;
-    const editor = editorRef.current;
+    const diff = diffRef.current;
     void run(t('opFormatter') as string, async () => {
-      if (editor) {
-        await editor.formatInPlace(async (filePath) => {
+      if (diff?.editable()) {
+        await diff.formatInPlace(async (filePath) => {
           await runFormatterRules([rule], [filePath], host);
         });
-        await editor.save();
+        await diff.save();
       } else {
         await runFormatterRules([rule], [active], host);
         diffCacheRef.current.delete(diffCacheEntryKey(active, activeStatus));
@@ -1112,7 +1158,7 @@ export function WorkspaceView({
     committedRevRef.current = null; // WC revision is now authoritative again
     justCommittedRef.current = false;
     void run(t('opUpdate') as string, async (credentials, log) => {
-      const { stdout } = await runSvn(['update'], cwd, credentials);
+      const { stdout, snapshotId } = await runSvn(['update'], cwd, credentials);
       const trimmed = stdout.trim();
       // Full per-file output goes to the log; the pill only needs the final summary line.
       if (trimmed) log?.({ kind: 'info', text: trimmed, ts: Date.now() });
@@ -1120,9 +1166,12 @@ export function WorkspaceView({
       setUpdateAvailable(false);
       lastRemoteCheck.current = Date.now();
       const revisionLine = /^At revision \d+\.$/m.exec(trimmed)?.[0];
-      return revisionLine
-        ? `${t('opUpdateDone') as string}\n${revisionLine}`
-        : (t('opUpdateDone') as string);
+      return {
+        text: revisionLine
+          ? `${t('opUpdateDone') as string}\n${revisionLine}`
+          : (t('opUpdateDone') as string),
+        snapshotId,
+      };
     });
   };
 
@@ -1181,8 +1230,7 @@ export function WorkspaceView({
 
   // Scrolls the diff so the previous/next change block sits in the vertical middle of the view.
   const jumpToChange = useCallback((dir: 'prev' | 'next') => {
-    if (editorRef.current) return editorRef.current.jump(dir);
-    return readOnlyDiffRef.current?.jump(dir) ?? false;
+    return diffRef.current?.jump(dir) ?? false;
   }, []);
 
   // Ctrl+Up / Ctrl+Down jumps between change blocks in the diff.
@@ -1262,6 +1310,7 @@ export function WorkspaceView({
     onResolveAny,
     onLog,
     onBlame,
+    onFileVersions: setVersionsPath,
     copyPath,
     absolutePath,
     openLocalFile,
@@ -1508,22 +1557,22 @@ export function WorkspaceView({
             diffIsNewFile={diffIsNewFile}
             diffMode={diffMode}
             chooseDiffMode={chooseDiffMode}
-            jumpToChange={jumpToChange}
             editState={editState}
             onResolveAny={onResolveAny}
             activeFormatterRule={!!activeFormatterRule}
             busy={busy}
             doFormatFile={doFormatFile}
             doFormatAndSave={doFormatAndSave}
-            editorRef={editorRef}
+            diffRef={diffRef}
             cwd={cwd}
             rootName={rootName}
             editable={editable}
             mtimes={mtimes}
+            baseRevision={baseRevision}
+            baseEntry={baseEntry}
             activeStatus={activeStatus}
             setEditState={setEditState}
             refresh={refresh}
-            readOnlyDiffRef={readOnlyDiffRef}
             diff={diff}
           />
         </div>
@@ -1650,6 +1699,30 @@ export function WorkspaceView({
 
         {showSettings && (
           <SvnSettingsPanel host={host} onClose={closeSettings} />
+        )}
+
+        {activeView === 'reflog' && !showSettings && cwd && (
+          <ReflogView
+            host={host}
+            cwd={cwd}
+            refreshTick={refreshTick}
+            show={showConfirm}
+            setPill={setPill}
+            diffMode={diffMode}
+            onDiffModeChange={chooseDiffMode}
+          />
+        )}
+
+        {versionsPath && cwd && (
+          <FileVersionsDialog
+            host={host}
+            cwd={cwd}
+            path={versionsPath}
+            refreshTick={refreshTick}
+            show={showConfirm}
+            setPill={setPill}
+            onClose={() => setVersionsPath(null)}
+          />
         )}
 
         {activeView === 'repo' && !showSettings && (

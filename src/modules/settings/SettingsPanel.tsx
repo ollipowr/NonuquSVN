@@ -255,6 +255,45 @@ export function SvnSettingsPanel({
                       />
                     </Row>
                   </Card>
+                  <Card title={t('settingsCardReflog') as string}>
+                    <Row
+                      label={t('settingsReflogDays') as string}
+                      hint={t('settingsReflogHint') as string}
+                    >
+                      <TextInput
+                        type="number"
+                        size="sm"
+                        min={1}
+                        value={settings.reflogMaxDays}
+                        onChange={(value) =>
+                          update(
+                            'reflogMaxDays',
+                            Math.max(
+                              1,
+                              Number(value) || DEFAULT_SETTINGS.reflogMaxDays,
+                            ),
+                          )
+                        }
+                      />
+                    </Row>
+                    <Row label={t('settingsReflogMB') as string}>
+                      <TextInput
+                        type="number"
+                        size="sm"
+                        min={1}
+                        value={settings.reflogMaxMB}
+                        onChange={(value) =>
+                          update(
+                            'reflogMaxMB',
+                            Math.max(
+                              1,
+                              Number(value) || DEFAULT_SETTINGS.reflogMaxMB,
+                            ),
+                          )
+                        }
+                      />
+                    </Row>
+                  </Card>
                   <Card title={t('settingsFileListSection') as string}>
                     <Row
                       label={t('settingsDefaultSelection') as string}

@@ -58,11 +58,30 @@ export async function loadRevisionFiles(
   const previous = String(Math.max(0, Number(revision) - 1));
   const read = async (rev: string) =>
     (await runSvn(['cat', '-r', rev, await targetAt(rev)], cwd)).stdout;
-  const [base, work] = await Promise.all([
+  // The file's own last change before `revision`, not the repository's previous revision.
+  const lastChange = async () =>
+    parseSvnLog(
+      (
+        await runSvn(
+          [
+            'log',
+            '-l',
+            '1',
+            '--xml',
+            '-r',
+            `${previous}:1`,
+            await targetAt(previous),
+          ],
+          cwd,
+        )
+      ).stdout,
+    )[0];
+  const [base, work, prior] = await Promise.all([
     action === 'A' ? '' : read(previous),
     action === 'D' ? '' : read(revision),
+    action === 'A' || previous === '0' ? undefined : lastChange(),
   ]);
-  return { base, work };
+  return { base, work, previous: prior };
 }
 
 /** Omitted revision preserves the existing working-copy blame/BASE-content behavior. */

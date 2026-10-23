@@ -1,0 +1,25 @@
+.svn-diff-pane-head--pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.svn-diff-pane-head--pair .svn-rev-arrow {
+  flex: 0 0 auto;
+  color: var(--nonu-text-faint);
+}
+.svn-rev-headline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.svn-rev-headline .svn-rev-number {
+  flex: 0 0 auto;
+  color: #fff;
+}
+.svn-rev-headline .svn-rev-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--nonu-font-ui, inherit);
+}

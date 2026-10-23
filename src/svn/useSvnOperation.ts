@@ -1,6 +1,6 @@
 import { t } from '@nonu/app/i18n';
 import type { AuthDialogResult, LogEntry } from '@nonu/components';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import {
   isAuthError,
@@ -20,11 +20,30 @@ export type OperationNotice = {
 } | null;
 /** Lets a long operation write intermediate lines to the output panel. */
 export type OperationLog = (entry: LogEntry) => void;
+/** `snapshotId` is set when the command stored a backup, which enables the undo action. */
+export type RunOutcome = { text: string; snapshotId?: string };
+export type OperationResult = string | RunOutcome;
 type PendingOp = {
   label: string;
-  fn: (credentials?: SvnCredentials, log?: OperationLog) => Promise<string>;
+  fn: (
+    credentials?: SvnCredentials,
+    log?: OperationLog,
+  ) => Promise<OperationResult>;
   refresh: boolean;
 };
+const outcomeOf = (out: OperationResult): RunOutcome =>
+  typeof out === 'string' ? { text: out } : out;
+function undoActionFor(
+  snapshotId: string | undefined,
+  undoRef: { current?: (snapshotId: string) => void },
+) {
+  return snapshotId && undoRef.current
+    ? {
+        label: t('undoDelete') as string,
+        onClick: () => undoRef.current?.(snapshotId),
+      }
+    : undefined;
+}
 /** First line is the toast title, the rest (if any) is the subtitle. */
 function splitNotice(out: string): { text: string; subtitle?: string } {
   const newline = out.indexOf('\n');
@@ -51,27 +70,40 @@ export function useSvnOperation({
   setPill,
   appendLog,
   refresh,
+  onUndo,
 }: {
   setBusy: (busy: boolean) => void;
   setPill: (notice: OperationNotice) => void;
   appendLog: (entry: LogEntry) => void;
   refresh: () => Promise<void>;
+  onUndo?: (snapshotId: string) => void;
 }) {
   const [pendingAuth, setPendingAuth] = useState<PendingOp | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
+  const undoRef = useRef(onUndo);
+  undoRef.current = onUndo;
   const run = useCallback(
     async (
       label: string,
-      fn: (credentials?: SvnCredentials, log?: OperationLog) => Promise<string>,
+      fn: (
+        credentials?: SvnCredentials,
+        log?: OperationLog,
+      ) => Promise<OperationResult>,
       options: { refresh?: boolean } = {},
     ) => {
       setBusy(true);
       setPill({ kind: 'info', text: `${label}…` }); // label is already translated at call site
       appendLog({ kind: 'info', text: `${label}…`, ts: Date.now() });
       try {
-        const out = await fn(undefined, appendLog);
+        const { text: out, snapshotId } = outcomeOf(
+          await fn(undefined, appendLog),
+        );
         const text = out || `${label} done.`;
-        setPill({ kind: 'success', ...splitNotice(text) });
+        setPill({
+          kind: 'success',
+          ...splitNotice(text),
+          action: undoActionFor(snapshotId, undoRef),
+        });
         appendLog({ kind: 'success', text, ts: Date.now() });
       } catch (err) {
         if (err instanceof SvnError && isAuthError(err)) {
@@ -124,9 +156,15 @@ export function useSvnOperation({
           ts: Date.now(),
         });
         setPill({ kind: 'info', text: `${pendingAuth.label}…` });
-        const out = await pendingAuth.fn(credentials, appendLog);
+        const { text: out, snapshotId } = outcomeOf(
+          await pendingAuth.fn(credentials, appendLog),
+        );
         const text = out || `${pendingAuth.label} done.`;
-        setPill({ kind: 'success', text });
+        setPill({
+          kind: 'success',
+          text,
+          action: undoActionFor(snapshotId, undoRef),
+        });
         appendLog({ kind: 'success', text, ts: Date.now() });
         setPendingAuth(null);
       } catch (err) {

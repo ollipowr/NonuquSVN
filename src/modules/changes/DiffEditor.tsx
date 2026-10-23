@@ -54,6 +54,11 @@ import {
 } from './conflicts.js';
 
 import { computeHunks, type Hunk, splitLines } from './diffHunks.js';
+import {
+  type DiffHeaders,
+  DiffPairHead,
+  DiffPaneHead,
+} from './RevisionHeadline.js';
 
 const ENTITIES: Record<string, string> = {
   amp: '&',
@@ -664,7 +669,7 @@ interface Props {
   syncScroll?: boolean;
   /** Read-only contents (for example a revision); skips the working-copy load. */
   fixed?: DiffFiles;
-  headers?: { old: string; new: string };
+  headers?: DiffHeaders;
   cwd?: string;
   /** Last-write timestamp used to reuse content until the working copy changes. */
   cacheVersion?: number;
@@ -1108,11 +1113,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
     if (mode === 'inline' || conflict)
       return (
         <div className="svn-diff-body svn-cm-wrap">
-          {headers && (
-            <div className="svn-diff-pane-head">
-              {[headers.old, headers.new].filter(Boolean).join('  →  ')}
-            </div>
-          )}
+          {headers && <DiffPairHead headers={headers} />}
           {main}
         </div>
       );
@@ -1123,11 +1124,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
           style={split.style}
         >
           <div className="svn-split-pane svn-cm-wrap">
-            {headers && (
-              <div className="svn-diff-pane-head" title={headers.old}>
-                {headers.old}
-              </div>
-            )}
+            {headers?.old && <DiffPaneHead info={headers.old} />}
             <DiffPane
               doc={files.base}
               mode="split-left"
@@ -1145,11 +1142,7 @@ export const EditableDiff = React.forwardRef<EditableDiffHandle, Props>(
           </div>
           <Splitter direction="h" onMouseDown={split.onMouseDown} />
           <div className="svn-split-pane svn-cm-wrap">
-            {headers && (
-              <div className="svn-diff-pane-head" title={headers.new}>
-                {headers.new}
-              </div>
-            )}
+            {headers && <DiffPaneHead info={headers.new} />}
             {main}
           </div>
         </div>

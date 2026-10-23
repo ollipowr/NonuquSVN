@@ -7,6 +7,7 @@ import {
   getLockInfo,
   lockFiles,
   type OperationNotice,
+  type OperationResult,
   runSvn,
   type SvnChange,
   type SvnCredentials,
@@ -16,53 +17,12 @@ import {
 import { useState } from 'react';
 
 import { hasConflictMarkers } from './conflicts.js';
+import { confirmRestore } from './restoreFlow.js';
+import { snapshotLocalDelete } from './snapshotLocalDelete.js';
 
-const psQuote = (value: string) => `'${value.replace(/'/g, "''")}'`;
-
-async function runPowershell(host: HostAdapter, script: string, cwd: string) {
-  const result = await host.exec(`powershell -NoProfile -Command "${script}"`, {
-    cwd,
-  });
-  if (result.exitCode !== 0) {
-    throw new Error(result.stderr.trim() || 'PowerShell failed.');
-  }
-  return result.stdout.trim();
-}
-
-const absPath = (cwd: string, path: string) =>
-  `${cwd.replace(/[\\/]+$/, '')}\\${path.replace(/\//g, '\\')}`;
-
-type UndoDelete = { backupDir: string; index: number };
-/** Edited files removed by a delete, keyed by working copy and path; kept until the app restarts. */
-const undoableDeletes = new Map<string, UndoDelete>();
+/** Snapshot ids of deletes, keyed by working copy and path; kept until the app restarts. */
+const undoableDeletes = new Map<string, { snapshotId: string }>();
 const undoKey = (cwd: string, path: string) => `${cwd}|${path}`;
-
-/** Copies edited files out of the working copy so an undo can put them back after revert.
- * shortcut: backup folders stay in TEMP after undo or restart, upgrade: remove them when their last file is restored */
-async function backupFiles(paths: string[], cwd: string, host: HostAdapter) {
-  const copies = paths.map(
-    (p, i) =>
-      `Copy-Item -LiteralPath ${psQuote(absPath(cwd, p))} -Destination (Join-Path $d ${i}) -Force`,
-  );
-  return runPowershell(
-    host,
-    `$d = Join-Path $env:TEMP ('nonu-svn-undo-' + [guid]::NewGuid()); New-Item -ItemType Directory -Force -Path $d | Out-Null; ${copies.join('; ')}; $d`,
-    cwd,
-  );
-}
-
-async function restoreFile(
-  path: string,
-  { backupDir, index }: UndoDelete,
-  cwd: string,
-  host: HostAdapter,
-) {
-  await runPowershell(
-    host,
-    `Copy-Item -LiteralPath (Join-Path ${psQuote(backupDir)} ${index}) -Destination ${psQuote(absPath(cwd, path))} -Force`,
-    cwd,
-  );
-}
 
 export function useFileActions({
   cwd,
@@ -78,7 +38,7 @@ export function useFileActions({
   host: HostAdapter;
   run: (
     label: string,
-    operation: (credentials?: SvnCredentials) => Promise<string>,
+    operation: (credentials?: SvnCredentials) => Promise<OperationResult>,
   ) => Promise<void>;
   showConfirm: ReturnType<typeof useConfirmation>['show'];
   removeFromList: (paths: string[]) => void;
@@ -110,42 +70,41 @@ export function useFileActions({
       onConfirm: () => {
         removeFromList(paths);
         void run(t('opRevert') as string, async (credentials) => {
-          const { stdout } = await runSvn(
+          const { stdout, snapshotId } = await runSvn(
             ['revert', '--depth', 'infinity', ...paths],
             cwd!,
             credentials,
           );
-          return (
-            stdout.trim() ||
-            (t('opRevertDone') as (n: number) => string)(paths.length)
-          );
+          return {
+            text:
+              stdout.trim() ||
+              (t('opRevertDone') as (n: number) => string)(paths.length),
+            snapshotId,
+          };
         });
       },
     });
   };
 
-  const onDelete = async (paths: string[], modified: string[]) => {
+  const onDelete = async (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
     removeFromList(paths);
-    let backupDir = '';
+    let snapshotId = '';
     let summary = '';
     await run(t('opDelete') as string, async (credentials) => {
-      if (modified.length > 0)
-        backupDir = await backupFiles(modified, cwd!, host);
-      const { stdout } = await runSvn(
+      const result = await runSvn(
         ['delete', '--force', ...paths],
         cwd!,
         credentials,
       );
+      snapshotId = result.snapshotId ?? '';
       summary =
-        stdout.trim() ||
+        result.stdout.trim() ||
         (t('opDeleteDone') as (n: number) => string)(paths.length);
       return summary;
     });
-    if (!summary || !backupDir) return;
-    modified.forEach((p, index) =>
-      undoableDeletes.set(undoKey(cwd!, p), { backupDir, index }),
-    );
+    if (!summary || !snapshotId) return;
+    paths.forEach((p) => undoableDeletes.set(undoKey(cwd!, p), { snapshotId }));
     setPill({
       kind: 'success',
       text: summary,
@@ -158,16 +117,50 @@ export function useFileActions({
 
   const onUndoDelete = (paths: string[]) => {
     if (!cwd || paths.length === 0) return;
-    void run(t('opUndoDelete') as string, async (credentials) => {
-      await runSvn(['revert', ...paths], cwd!, credentials);
-      for (const p of paths) {
-        const entry = undoableDeletes.get(undoKey(cwd!, p));
-        if (!entry) continue;
-        await restoreFile(p, entry, cwd!, host);
-        undoableDeletes.delete(undoKey(cwd!, p));
+    const bySnapshot = new Map<string, string[]>();
+    for (const p of paths) {
+      const entry = undoableDeletes.get(undoKey(cwd, p));
+      if (entry)
+        bySnapshot.set(entry.snapshotId, [
+          ...(bySnapshot.get(entry.snapshotId) ?? []),
+          p,
+        ]);
+    }
+    if (bySnapshot.size === 0) return;
+
+    const conflicts = new Set<string>();
+    const undo = (keepCopies: boolean) =>
+      void run(t('opUndoDelete') as string, async (credentials) => {
+        const failed: string[] = [];
+        for (const [snapshotId, files] of bySnapshot) {
+          const kept = keepCopies ? files.filter((p) => conflicts.has(p)) : [];
+          const reverting = files.filter((p) => !kept.includes(p));
+          if (reverting.length > 0)
+            await runSvn(['revert', ...reverting], cwd!, credentials);
+          const result = await host.restoreSnapshot?.(
+            snapshotId,
+            files,
+            keepCopies ? 'copy' : 'overwrite',
+          );
+          for (const p of files) {
+            if (result?.failed.includes(p)) failed.push(p);
+            else undoableDeletes.delete(undoKey(cwd!, p));
+          }
+        }
+        if (failed.length > 0)
+          throw new Error(
+            (t('restoreFailed') as (p: string) => string)(failed.join(', ')),
+          );
+        return (t('opUndoDeleteDone') as (n: number) => string)(paths.length);
+      });
+
+    void (async () => {
+      for (const [snapshotId, files] of bySnapshot) {
+        const check = await host.restoreSnapshot?.(snapshotId, files, 'check');
+        check?.conflicts.forEach((p) => conflicts.add(p));
       }
-      return (t('opUndoDeleteDone') as (n: number) => string)(paths.length);
-    });
+      confirmRestore(showConfirm, [...conflicts], undo);
+    })().catch((err) => setPill(toPill(err)));
   };
 
   const hasUndoDelete = (path: string) =>
@@ -185,6 +178,7 @@ export function useFileActions({
       onConfirm: () => {
         removeFromList(paths);
         void run(t('opDeleteLocal') as string, async () => {
+          const snapshotId = await snapshotLocalDelete(host, cwd!, paths);
           for (const p of paths) {
             const abs = `${cwd!.replace(/[\\/]+$/, '')}\\${p.replace(/\//g, '\\')}`;
             const result = await host.exec(
@@ -195,9 +189,12 @@ export function useFileActions({
               throw new Error(result.stderr.trim() || `Could not delete ${p}.`);
             }
           }
-          return (t('opDeleteLocalDone') as (n: number) => string)(
-            paths.length,
-          );
+          return {
+            text: (t('opDeleteLocalDone') as (n: number) => string)(
+              paths.length,
+            ),
+            snapshotId,
+          };
         });
       },
     });
@@ -218,11 +215,7 @@ export function useFileActions({
       ['modified', 'conflicted', 'replaced'].includes(c.status),
     );
     const proceed = () => {
-      if (versioned.length > 0)
-        void onDelete(
-          versioned,
-          modified.map((c) => c.path),
-        );
+      if (versioned.length > 0) void onDelete(versioned);
       if (unversioned.length > 0) onDeleteLocal(unversioned);
     };
     if (versioned.length === 0) {
@@ -255,15 +248,17 @@ export function useFileActions({
           throw new Error((t('resolveHasMarkers') as (p: string) => string)(p));
         }
       }
-      const { stdout } = await runSvn(
+      const { stdout, snapshotId } = await runSvn(
         ['resolve', '--accept', 'working', ...paths],
         cwd,
         credentials,
       );
-      return (
-        stdout.trim() ||
-        (t('opResolveDone') as (n: number) => string)(paths.length)
-      );
+      return {
+        text:
+          stdout.trim() ||
+          (t('opResolveDone') as (n: number) => string)(paths.length),
+        snapshotId,
+      };
     });
   };
 
@@ -276,12 +271,15 @@ export function useFileActions({
     if (!cwd) return;
     setTreeConflictChoice(null);
     void run(t('opResolve') as string, async (credentials) => {
-      const { stdout } = await runSvn(
+      const { stdout, snapshotId } = await runSvn(
         ['resolve', '--accept', 'working', path],
         cwd,
         credentials,
       );
-      return stdout.trim() || (t('opResolveDone') as (n: number) => string)(1);
+      return {
+        text: stdout.trim() || (t('opResolveDone') as (n: number) => string)(1),
+        snapshotId,
+      };
     });
   };
 
@@ -290,13 +288,20 @@ export function useFileActions({
     setTreeConflictChoice(null);
     removeFromList([path]);
     void run(t('opResolve') as string, async (credentials) => {
-      await runSvn(['delete', '--force', path], cwd, credentials);
+      const deleted = await runSvn(
+        ['delete', '--force', path],
+        cwd,
+        credentials,
+      );
       const { stdout } = await runSvn(
         ['resolve', '--accept', 'working', path],
         cwd,
         credentials,
       );
-      return stdout.trim() || (t('opResolveDone') as (n: number) => string)(1);
+      return {
+        text: stdout.trim() || (t('opResolveDone') as (n: number) => string)(1),
+        snapshotId: deleted.snapshotId,
+      };
     });
   };
 

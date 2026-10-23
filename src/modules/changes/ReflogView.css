@@ -1,0 +1,55 @@
+.reflog {
+  display: grid;
+  grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+
+.reflog-list,
+.reflog-files {
+  overflow: auto;
+  border-right: 1px solid var(--nonu-border);
+}
+
+.reflog-command {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.reflog-muted {
+  color: var(--nonu-text-muted);
+  font-size: 12px;
+}
+
+.reflog-detail {
+  display: grid;
+  grid-template-rows: auto minmax(120px, 35%) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+.reflog-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--nonu-border);
+}
+
+.reflog-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reflog-diff {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reflog-empty {
+  padding: 24px;
+  color: var(--nonu-text-muted);
+}

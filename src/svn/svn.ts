@@ -1,4 +1,5 @@
 import { t } from '@nonu/app/i18n';
+import type { HostAdapter, SnapshotFileInput } from '@nonu/host/types';
 import { invalidateWorkspace } from '@nonu/modules/workspace';
 import { execSvn, getPanelHost } from '@nonu/stores';
 
@@ -54,15 +55,124 @@ function maskCommand(args: string[]): string {
   return ['svn', ...masked].join(' ');
 }
 
+const SNAPSHOT_COMMANDS = [
+  'update',
+  'switch',
+  'merge',
+  'revert',
+  'delete',
+  'resolve',
+];
+const SNAPSHOT_CODES = new Set(['M', 'A', 'C', '?', '!']);
+const TARGETED_COMMANDS = ['revert', 'delete', 'resolve'];
+const VALUE_FLAGS = new Set(['--depth', '--accept', '-r', '--revision']);
+
+/** Paths a command acts on; update, switch and merge snapshot the whole working copy instead. */
+function snapshotTargets(args: string[]): string[] {
+  if (!TARGETED_COMMANDS.includes(args[0])) return [];
+  const targets: string[] = [];
+  for (let i = 1; i < args.length; i++) {
+    if (VALUE_FLAGS.has(args[i])) i++;
+    else if (!args[i].startsWith('-')) targets.push(args[i]);
+  }
+  return targets;
+}
+
+type SnapshotGate = (unreadable: string[]) => Promise<boolean>;
+
+/** Asks the user before a command runs without backing up locked files; the workspace view installs it. */
+let snapshotGate: SnapshotGate = async () => false;
+
+export function setSnapshotGate(gate: SnapshotGate) {
+  snapshotGate = gate;
+}
+
+/** Locked files can be left out only when each one is a named target and another target stays. */
+function canSkip(args: string[], unreadable: string[]): boolean {
+  const targets = snapshotTargets(args);
+  return (
+    unreadable.every((p) => targets.includes(p)) &&
+    unreadable.length < targets.length
+  );
+}
+
+/** Stores changed files before a command runs; returns the args to run and the snapshot id. */
+async function backUpBeforeCommand(
+  host: HostAdapter,
+  args: string[],
+  cwd: string,
+  credentials?: SvnCredentials,
+): Promise<{ args: string[]; snapshotId?: string }> {
+  const { stdout } = await runSvn(
+    ['status', '--depth', 'infinity', ...snapshotTargets(args)],
+    cwd,
+  );
+  const changes = parseSvnStatus(stdout).filter(
+    (c) => SNAPSHOT_CODES.has(c.code) && !c.propsOnly,
+  );
+  const dirs = await findDirectories(
+    changes.map((c) => c.path),
+    cwd,
+    (script, opts) => host.exec(script, opts),
+  );
+  const files: SnapshotFileInput[] = [];
+  const unreadable: string[] = [];
+  for (const c of changes) {
+    if (dirs.has(c.path)) continue;
+    const content =
+      c.code === '!'
+        ? null
+        : await host.readFileBase64(`${cwd}/${c.path}`).catch(() => undefined);
+    if (content === undefined) {
+      unreadable.push(c.path);
+      continue;
+    }
+    files.push({ path: c.path, statusBefore: c.code, content });
+  }
+  let runArgs = args;
+  if (unreadable.length > 0) {
+    if (!canSkip(args, unreadable) || !(await snapshotGate(unreadable)))
+      throw new Error(
+        (t('snapshotUnreadable') as (p: string) => string)(
+          unreadable.join(', '),
+        ),
+      );
+    runArgs = args.filter((a) => !unreadable.includes(a));
+  }
+  const command = maskCommand([
+    ...runArgs,
+    ...credentialArgs(credentials),
+    ...GLOBAL_FLAGS,
+  ]);
+  const record = await host.snapshot?.({ command, workingCopy: cwd }, files);
+  return { args: runArgs, snapshotId: record?.id };
+}
+
 export async function runSvn(
   args: string[],
   cwd: string,
   credentials?: SvnCredentials,
-): Promise<{ stdout: string; stderr: string }> {
-  const fullArgs = [...args, ...credentialArgs(credentials), ...GLOBAL_FLAGS];
-  const displayCommand = maskCommand(fullArgs);
+): Promise<{ stdout: string; stderr: string; snapshotId?: string }> {
+  let displayCommand = maskCommand([
+    ...args,
+    ...credentialArgs(credentials),
+    ...GLOBAL_FLAGS,
+  ]);
   try {
     const host = getPanelHost();
+    const backup =
+      host?.snapshot &&
+      SNAPSHOT_COMMANDS.includes(args[0]) &&
+      !args.includes('--dry-run')
+        ? await backUpBeforeCommand(host, args, cwd, credentials)
+        : undefined;
+    const runArgs = backup?.args ?? args;
+    const fullArgs = [
+      ...runArgs,
+      ...credentialArgs(credentials),
+      ...GLOBAL_FLAGS,
+    ];
+    displayCommand = maskCommand(fullArgs);
     const result = host?.execSvnArgs
       ? await host.execSvnArgs(fullArgs, { cwd, timeout: 60000 })
       : await execSvn(fullArgs, cwd);
@@ -75,7 +185,11 @@ export async function runSvn(
         displayCommand,
       );
     }
-    return { stdout: result.stdout, stderr: result.stderr };
+    return {
+      stdout: result.stdout,
+      stderr: result.stderr,
+      snapshotId: backup?.snapshotId,
+    };
   } catch (err) {
     if (err instanceof SvnError) throw err;
     const msg = err instanceof Error ? err.message : String(err);

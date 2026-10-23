@@ -13,6 +13,11 @@ import React, {
 import { wrapRange } from './conflicts.js';
 import { wordDiff } from './diffHunks.js';
 import { nextChangeIndex } from './diffNavigation.js';
+import {
+  type DiffHeaders,
+  DiffPairHead,
+  DiffPaneHead,
+} from './RevisionHeadline.js';
 
 const isChangeCls = (cls?: string) =>
   cls === 'svn-diff-add' || cls === 'svn-diff-del';
@@ -193,7 +198,7 @@ export const DiffView = forwardRef<
     mode?: 'inline' | 'split';
     hideHunks?: boolean;
     hideMetadata?: boolean;
-    splitHeaders?: { old: string; new: string };
+    headers?: DiffHeaders;
     syncScroll?: boolean;
   }
 >(function DiffView(
@@ -203,7 +208,7 @@ export const DiffView = forwardRef<
     mode = 'inline',
     hideHunks = false,
     hideMetadata = false,
-    splitHeaders,
+    headers,
     syncScroll = true,
   },
   ref,
@@ -446,11 +451,7 @@ export const DiffView = forwardRef<
             className="svn-split-pane"
             onScroll={(event) => handleSyncScroll(event, 'old')}
           >
-            {splitHeaders && (
-              <div className="svn-diff-pane-head" title={splitHeaders.old}>
-                {splitHeaders.old}
-              </div>
-            )}
+            {headers?.old && <DiffPaneHead info={headers.old} />}
             {units.map(([l], u) =>
               l >= 0 ? line(rows[l], l, 'old') : emptySide(u),
             )}
@@ -460,18 +461,17 @@ export const DiffView = forwardRef<
             className="svn-split-pane"
             onScroll={(event) => handleSyncScroll(event, 'new')}
           >
-            {splitHeaders && (
-              <div className="svn-diff-pane-head" title={splitHeaders.new}>
-                {splitHeaders.new}
-              </div>
-            )}
+            {headers && <DiffPaneHead info={headers.new} />}
             {units.map(([, r], u) =>
               r >= 0 ? line(rows[r], r, 'new') : emptySide(u),
             )}
           </div>
         </>
       ) : (
-        rows.map((r, i) => line(r, i))
+        <>
+          {headers && <DiffPairHead headers={headers} />}
+          {rows.map((r, i) => line(r, i))}
+        </>
       )}
     </div>
   );

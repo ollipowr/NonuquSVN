@@ -21,6 +21,7 @@ type Actions = Pick<
 > & {
   onLog: (path: string) => void;
   onBlame: (path: string) => void;
+  onFileVersions: (path: string) => void;
   copyPath: (path: string) => Promise<void>;
   absolutePath: (path: string) => string;
   openLocalFile: (path: string) => Promise<void>;
@@ -51,6 +52,7 @@ export function buildChangeMenu(
     onResolveAny,
     onLog,
     onBlame,
+    onFileVersions,
     copyPath,
     absolutePath,
     openLocalFile,
@@ -268,6 +270,11 @@ export function buildChangeMenu(
         onClick: () => onBlame(change.path),
       });
     }
+    items.push({
+      label: t('ctxFileVersions') as string,
+      icon: 'history',
+      onClick: () => onFileVersions(change.path),
+    });
 
     // Ignore group
     if (change.status === 'unversioned') {

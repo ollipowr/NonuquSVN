@@ -3,7 +3,7 @@ import { Button, ProgressBar, Select } from '@nonu/components';
 import { Spinner } from '@nonu/components/ui/Spinner';
 import { TextField } from '@nonu/components/ui/TextField';
 import { RevisionList } from '@nonu/modules/history';
-import type { SvnCredentials } from '@nonu/svn';
+import type { OperationResult, SvnCredentials } from '@nonu/svn';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './MergeView.css';
 import {
@@ -31,7 +31,7 @@ export interface MergeViewProps {
   defaultTargetId?: string;
   run: (
     label: string,
-    fn: (credentials?: SvnCredentials) => Promise<string>,
+    fn: (credentials?: SvnCredentials) => Promise<OperationResult>,
   ) => Promise<void>;
   onClose: () => void;
   /** Called after a real merge so the panel reloads and seeds its commit message. */
@@ -420,9 +420,15 @@ export function MergeView({
         target.localPath!,
       );
       // Conflicts do NOT make svn exit non-zero, so the summary is the signal.
-      return r.conflicts > 0
-        ? (t('mergeDoneConflicts') as (n: number) => string)(r.conflicts)
-        : (t('mergeDoneClean') as (n: number) => string)(pickedSorted.length);
+      return {
+        text:
+          r.conflicts > 0
+            ? (t('mergeDoneConflicts') as (n: number) => string)(r.conflicts)
+            : (t('mergeDoneClean') as (n: number) => string)(
+                pickedSorted.length,
+              ),
+        snapshotId: r.snapshotId,
+      };
     })
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : String(err)),

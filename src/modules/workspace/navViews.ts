@@ -18,8 +18,16 @@ export function buildNavViews(o: {
     },
     {
       id: 'logs',
-      icon: 'history',
+      icon: 'timeline',
       label: t('navChangelogs') as string,
+      group: 'workspace',
+      disabled: !o.hasWorkspace,
+      disabledTitle,
+    },
+    {
+      id: 'reflog',
+      icon: 'restore',
+      label: t('navReflog') as string,
       group: 'workspace',
       disabled: !o.hasWorkspace,
       disabledTitle,

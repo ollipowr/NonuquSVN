@@ -17,6 +17,45 @@ export interface HostStorage {
   setGlobal(key: string, value: unknown): Promise<void>;
 }
 
+export interface SnapshotEntryInput {
+  command: string;
+  workingCopy: string;
+}
+
+export interface SnapshotFileInput {
+  path: string;
+  statusBefore: string;
+  /** Base64 content before the command; null when the file did not exist. */
+  content: string | null;
+}
+
+interface SnapshotFile {
+  path: string;
+  statusBefore: string;
+  hash: string | null;
+}
+
+export interface SnapshotRecord {
+  id: string;
+  time: string;
+  /** Command with passwords masked. */
+  command: string;
+  workingCopy: string;
+  files: SnapshotFile[];
+}
+
+/** `overwrite` replaces existing files; `missing-only` keeps them; `copy` writes differing files beside the original; `check` writes nothing and reports differing files as conflicts. */
+export type RestoreMode = 'overwrite' | 'missing-only' | 'copy' | 'check';
+
+export interface RestoreResult {
+  restored: string[];
+  /** Existing files that differ from the snapshot (only reported in `check` mode). */
+  conflicts: string[];
+  skipped: string[];
+  /** Files that failed to restore; the others are still processed. */
+  failed: string[];
+}
+
 export interface AiProvider {
   sendPrompt(opts: {
     prompt: string;
@@ -67,6 +106,24 @@ export interface HostAdapter {
 
   /** Open a native folder picker and return the chosen path, or null if cancelled. */
   chooseFolder?(): Promise<string | null>;
+
+  /** Stores the file contents taken before a command, deduplicated by hash. */
+  snapshot?(
+    entry: SnapshotEntryInput,
+    files: SnapshotFileInput[],
+  ): Promise<SnapshotRecord>;
+
+  /** Lists the stored snapshots of a workspace, newest first. */
+  listSnapshots?(workspace: string): Promise<SnapshotRecord[]>;
+
+  restoreSnapshot?(
+    id: string,
+    files: string[],
+    mode: RestoreMode,
+  ): Promise<RestoreResult>;
+
+  /** Base64 content of one file stored in a snapshot; null when it was not stored. */
+  readSnapshotFile?(id: string, path: string): Promise<string | null>;
 
   ai: AiProvider | null;
 }

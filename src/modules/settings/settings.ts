@@ -62,6 +62,10 @@ export interface SvnSettings {
   /** Multiplier for all UI text sizes (see --nonu-font-scale). */
   fontScale: number;
   formatterRules: FormatterRule[];
+  /** Undo snapshots older than this many days are pruned. */
+  reflogMaxDays: number;
+  /** Undo snapshots are pruned oldest-first until a workspace stays under this size. */
+  reflogMaxMB: number;
 }
 export const SETTINGS_CHANGED_EVENT = 'svn-settings-changed';
 
@@ -84,6 +88,8 @@ export const DEFAULT_SETTINGS: SvnSettings = {
   uiLanguage: 'de',
   fontScale: 1,
   formatterRules: [],
+  reflogMaxDays: 30,
+  reflogMaxMB: 500,
 };
 
 const SETTINGS_KEY = 'svn.settings';

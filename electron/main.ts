@@ -4,6 +4,16 @@ import fs from 'node:fs';
 import { exec, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { parseShellRequest } from '../src/host/shellRequest';
+import type { RestoreMode, SnapshotEntryInput, SnapshotFileInput } from '../src/host/types';
+import {
+  listSnapshots,
+  pruneAllSnapshots,
+  pruneSnapshots,
+  readSnapshotFile,
+  restoreSnapshot,
+  type SnapshotLimits,
+  saveSnapshot,
+} from './snapshotStore';
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -300,6 +310,34 @@ ipcMain.handle('storage-set-global', (_e, key: string, value: unknown) => {
   (storageData['__global__'] as Record<string, unknown>)[key] = value;
   flushStorage();
 });
+
+const reflogRoot = path.join(app.getPath('userData'), 'reflog');
+
+function reflogLimits(): SnapshotLimits {
+  const global = (storageData['__global__'] as Record<string, unknown> | undefined) ?? {};
+  return {
+    maxDays: Number(global.reflogMaxDays ?? 30),
+    maxMB: Number(global.reflogMaxMB ?? 500),
+  };
+}
+
+pruneAllSnapshots(reflogRoot, reflogLimits());
+
+ipcMain.handle('snapshot-save', (_e, entry: SnapshotEntryInput, files: SnapshotFileInput[]) => {
+  const record = saveSnapshot(reflogRoot, entry, files);
+  pruneSnapshots(reflogRoot, entry.workingCopy, reflogLimits());
+  return record;
+});
+
+ipcMain.handle('snapshot-list', (_e, workspace: string) => listSnapshots(reflogRoot, workspace));
+
+ipcMain.handle('snapshot-restore', (_e, id: string, files: string[], mode: RestoreMode) =>
+  restoreSnapshot(reflogRoot, id, files, mode),
+);
+
+ipcMain.handle('snapshot-read-file', (_e, id: string, file: string) =>
+  readSnapshotFile(reflogRoot, id, file),
+);
 
 ipcMain.handle('open-file', async (_e, filePath: string) => {
   const stat = await fs.promises.stat(filePath);

@@ -459,12 +459,16 @@ export async function mergeRevisions(opts: {
   revs: number[];
   dryRun: boolean;
   credentials?: SvnCredentials;
-}): Promise<MergeResult> {
+}): Promise<MergeResult & { snapshotId?: string }> {
   const args = ['merge'];
   if (opts.dryRun) args.push('--dry-run');
   args.push('-c', opts.revs.join(','), opts.sourceUrl, opts.targetPath);
-  const { stdout } = await runSvn(args, opts.targetPath, opts.credentials);
-  return parseMergeResult(stdout);
+  const { stdout, snapshotId } = await runSvn(
+    args,
+    opts.targetPath,
+    opts.credentials,
+  );
+  return { ...parseMergeResult(stdout), snapshotId };
 }
 
 export async function switchBranch(
