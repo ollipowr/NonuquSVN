@@ -59,7 +59,7 @@ export function useWorkingCopyDiff({
       setDiffIsNewFile(hit.isNewFile);
     }
     if (!hasLoaded) return;
-    const isUnversioned = activeStatus === 'unversioned';
+    const isNew = activeStatus === 'unversioned' || activeStatus === 'added';
     let cancelled = false;
     const store = (text: string, isNewFile: boolean) => {
       if (cancelled) return;
@@ -72,7 +72,7 @@ export function useWorkingCopyDiff({
     };
     (async () => {
       try {
-        if (isUnversioned) {
+        if (isNew) {
           store((await readFileRaw(active, cwd)) || t('diffEmptyFile'), true);
           return;
         }

@@ -752,21 +752,6 @@ export function WorkspaceView({
     };
   }, [cwd, changes, host]);
 
-  const baseRevision = repo?.revision;
-  const [baseEntry, setBaseEntry] = useState<SvnLogEntry>();
-  useEffect(() => {
-    if (!cwd || !baseRevision) return;
-    let cancelled = false;
-    loadHistory(cwd, { revision: baseRevision, limit: 1 })
-      .then(([entry]) => {
-        if (!cancelled) setBaseEntry(entry);
-      })
-      .catch((err) => console.warn('[svn] base revision fetch failed:', err));
-    return () => {
-      cancelled = true;
-    };
-  }, [cwd, baseRevision]);
-
   // Load the focused file's diff. Cached diffs show at once and revalidate after refresh; unversioned files show raw content.
   const rootName =
     cwd
@@ -775,6 +760,27 @@ export function WorkspaceView({
       .pop() ?? cwd;
   const activeEntry = changes.find((c) => c.path === active);
   const activeStatus = activeEntry?.status;
+  // The file's own last change at BASE, like the log view; the working copy revision would be wrong.
+  const [baseEntry, setBaseEntry] = useState<SvnLogEntry>();
+  useEffect(() => {
+    setBaseEntry(undefined);
+    if (
+      !cwd ||
+      !active ||
+      activeStatus === 'added' ||
+      activeStatus === 'unversioned'
+    )
+      return;
+    let cancelled = false;
+    loadFileHistory(cwd, active, 'BASE')
+      .then(([entry]) => {
+        if (!cancelled) setBaseEntry(entry);
+      })
+      .catch((err) => console.warn('[svn] base revision fetch failed:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [cwd, active, activeStatus, refreshTick]);
   const { diff, setDiff, diffIsNewFile } = useWorkingCopyDiff({
     cwd,
     active,
@@ -849,7 +855,9 @@ export function WorkspaceView({
     !!active &&
     !!activeChange &&
     !['deleted', 'missing'].includes(activeChange.status) &&
-    ['modified', 'unversioned', 'conflicted'].includes(activeChange.status) &&
+    ['modified', 'added', 'unversioned', 'conflicted'].includes(
+      activeChange.status,
+    ) &&
     !activeChange.propsOnly;
   const toggle = (path: string) => {
     setSelected((prev) => {
@@ -1583,7 +1591,6 @@ export function WorkspaceView({
             rootName={rootName}
             editable={editable}
             mtimes={mtimes}
-            baseRevision={baseRevision}
             baseEntry={baseEntry}
             activeStatus={activeStatus}
             setEditState={setEditState}

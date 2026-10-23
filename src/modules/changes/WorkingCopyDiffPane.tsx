@@ -23,7 +23,6 @@ export function WorkingCopyDiffPane({
   rootName,
   editable,
   mtimes,
-  baseRevision,
   baseEntry,
   activeStatus,
   setEditState,
@@ -46,7 +45,6 @@ export function WorkingCopyDiffPane({
   cwd: string;
   editable: boolean;
   mtimes: Map<string, number>;
-  baseRevision?: string;
   baseEntry?: SvnLogEntry;
   activeStatus?: string;
   setEditState: (state: EditableDiffState) => void;
@@ -61,7 +59,7 @@ export function WorkingCopyDiffPane({
       ? undefined
       : {
           label: t('diffSplitHeaderBase') as string,
-          revision: baseRevision,
+          revision: baseEntry?.revision,
           date: baseEntry ? new Date(baseEntry.date).toLocaleString() : '-',
           author: baseEntry?.author,
         },
