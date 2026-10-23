@@ -18,6 +18,22 @@ interface ToastProps {
   onErrorClick: () => void;
 }
 
+// A quoted path is the part worth reading: truncate it at the start, keep its end.
+function ToastTitle({ text }: { text: string }) {
+  const line = text.trim().split('\n')[0];
+  const m = /^([^']*')([^']+)('.*)$/.exec(line);
+  if (!m) return <span className="svn-toast-title">{text}</span>;
+  return (
+    <span className="svn-toast-title svn-toast-title--path">
+      <span>{m[1]}</span>
+      <span className="svn-toast-path">
+        <bdo dir="ltr">{m[2]}</bdo>
+      </span>
+      <span>{m[3]}</span>
+    </span>
+  );
+}
+
 /** Floating feedback for the last SVN operation; errors stay until dismissed. */
 export function Toast({ notice, onDismiss, onErrorClick }: ToastProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -51,7 +67,7 @@ export function Toast({ notice, onDismiss, onErrorClick }: ToastProps) {
       role="status"
     >
       <div className="svn-toast-body">
-        <span className="svn-toast-title">{notice.text}</span>
+        <ToastTitle text={notice.text} />
         {notice.subtitle && (
           <span className="svn-toast-subtitle">{notice.subtitle}</span>
         )}

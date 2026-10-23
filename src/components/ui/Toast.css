@@ -33,6 +33,22 @@
   white-space: nowrap;
 }
 
+.svn-toast-title--path {
+  display: flex;
+}
+
+.svn-toast-title--path > span {
+  flex-shrink: 0;
+}
+
+.svn-toast-title--path > .svn-toast-path {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}
+
 .svn-toast-action {
   flex-shrink: 0;
   padding: 0 4px;
