@@ -1,3 +1,4 @@
+import { t } from '@nonu/app/i18n';
 import {
   forwardRef,
   type ReactNode,
@@ -96,7 +97,11 @@ export const DiffPanel = forwardRef<DiffPanelHandle, DiffPanelProps>(
       [source, jump],
     );
 
-    let body: ReactNode = placeholder;
+    let body: ReactNode = placeholder ?? (
+      <div className="svn-empty">
+        <div className="svn-empty-hint">{t('selectFileForDiff') as string}</div>
+      </div>
+    );
     if (source?.kind === 'text') {
       body = (
         <DiffView
