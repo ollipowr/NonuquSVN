@@ -281,9 +281,11 @@ export function ChangesList(props: ChangesListProps) {
                   : 'expand_more'}
               </span>
               <span className="material-symbols-outlined svn-folder-icon">
-                folder
+                {entry.dir === '.' ? 'folder_special' : 'folder'}
               </span>
-              <span className="svn-folder-name">{entry.dir}</span>
+              <span className="svn-folder-name">
+                {entry.dir === '.' ? '(root)' : entry.dir}
+              </span>
               <span className="svn-folder-count">{entry.items.length}</span>
             </button>
           );

@@ -234,7 +234,9 @@ export function RevisionList({
                               kind={info.kind}
                               label={info.label}
                             />
-                            <span title={p.path}>{p.path}</span>
+                            <span title={p.path}>
+                              {p.path.replace(/^\/+/, '')}
+                            </span>
                             {p.copyFromPath && (
                               <small>&larr; {p.copyFromPath}</small>
                             )}

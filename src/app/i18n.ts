@@ -311,8 +311,7 @@ const translations = {
     settingsRememberView:
       'Filter, Sortierung und Gruppierung über Neustarts merken',
     settingsOpenLastOnStart: 'Beim Start die letzte Arbeitskopie öffnen',
-    settingsSingleProject:
-      'Ich habe nur ein Projekt: an = Projekttitel als App-Titel, aus = Standard',
+    settingsSingleProject: 'Einzelprojekt',
     homeContinue: 'Weiter mit',
     projectConflicts: 'Konflikte',
     projectUpdates: 'Updates verfügbar',
@@ -1031,8 +1030,7 @@ const translations = {
     settingsRememberView:
       'Remember filter, sorting and grouping across restarts',
     settingsOpenLastOnStart: 'Open the last working copy on startup',
-    settingsSingleProject:
-      'I only have one project: on = project name as app title, off = default',
+    settingsSingleProject: 'Single project',
     homeContinue: 'Continue with',
     projectConflicts: 'Conflicts',
     projectUpdates: 'Updates available',

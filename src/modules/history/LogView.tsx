@@ -514,7 +514,10 @@ export function LogView({
                         kind={info.kind}
                         label={info.label}
                       />
-                      <span title={itemPath.path}>{itemPath.path}</span>
+                      {/* RTL box: a leading "/" would render at the end */}
+                      <span title={itemPath.path}>
+                        {itemPath.path.replace(/^\/+/, '')}
+                      </span>
                       {itemPath.copyFromPath && (
                         <small>
                           &larr; {itemPath.copyFromPath}@{itemPath.copyFromRev}

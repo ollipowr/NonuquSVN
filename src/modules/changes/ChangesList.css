@@ -6,32 +6,18 @@
 }
 
 .svn-row {
-  padding: 3px 10px;
-  cursor: pointer;
   border-left: 2px solid transparent;
-  user-select: none;
 }
 
-.svn-row:hover {
-  background: var(--nonu-bg-secondary);
-}
 .svn-row--active {
-  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
   border-left: 3px solid var(--nonu-primary);
   padding-left: 9px;
-  font-weight: 600;
 }
-.svn-row--checked {
-  background: color-mix(in srgb, var(--nonu-primary) 6%, transparent);
-}
-.svn-row.svn-row--highlighted {
-  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 12%, transparent);
-}
-.svn-row.svn-row--highlighted.svn-row--checked {
-  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 18%, transparent);
-}
+.svn-row--checked,
+.svn-row.svn-row--highlighted,
 .svn-row.svn-row--menu-target {
-  background: color-mix(in srgb, var(--nonu-primary, #4a9eff) 10%, transparent);
+  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
 }
 .svn-row--indented {
   padding-left: 24px;
@@ -100,11 +86,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--nonu-font-mono, monospace);
-  font-size: var(--nonu-text-sm);
   min-width: 0;
   direction: rtl;
   text-align: left;
+  font: var(--nonu-text-sm) var(--nonu-font-mono, monospace);
 }
 .svn-lock-indicator {
   font-size: var(--nonu-icon-sm, 14px);
@@ -116,10 +101,7 @@
   width: 116px;
   overflow: hidden;
   text-align: right;
-  font-family: var(--nonu-font-mono, monospace);
-  font-size: var(--nonu-text-sm);
   color: var(--nonu-text-faint);
-  opacity: 0.6;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -127,9 +109,9 @@
   visibility: hidden;
 }
 .svn-row-actions {
-  display: grid;
-  grid-template-columns: repeat(4, 16px);
-  column-gap: 2px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
   width: 68px;
   opacity: 0;
   transition: opacity 0.1s;
@@ -144,6 +126,9 @@
   width: 16px;
   height: 19px;
   overflow: hidden;
+}
+.svn-row-action-slot:empty {
+  display: none;
 }
 .svn-row-action-slot .svn-btn.svn-btn--ghost {
   padding: 0;

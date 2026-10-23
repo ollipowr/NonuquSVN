@@ -1,3 +1,12 @@
+:where(.svn-structured-row) {
+  padding: var(--svn-list-row-padding, 5px 10px);
+  border-bottom: 1px solid var(--nonu-border);
+  background: transparent;
+  color: var(--nonu-text);
+  font-size: var(--nonu-text-sm);
+  cursor: pointer;
+  user-select: none;
+}
 .svn-structured-row {
   display: grid;
   grid-template-columns: var(--svn-list-columns);
@@ -5,10 +14,16 @@
   column-gap: 8px;
   min-width: 0;
 }
+.svn-structured-row:hover {
+  background: var(--nonu-bg-secondary);
+}
+.svn-structured-row[aria-selected="true"] {
+  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
+}
 .svn-structured-row > * {
   min-width: 0;
 }
 .svn-structured-row--active {
-  background: color-mix(in srgb, var(--nonu-primary) 14%, transparent);
+  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
   box-shadow: inset 3px 0 var(--nonu-primary);
 }

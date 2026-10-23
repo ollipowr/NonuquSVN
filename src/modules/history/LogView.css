@@ -116,18 +116,7 @@
 }
 .svn-log-row {
   width: 100%;
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--nonu-border);
-  background: transparent;
-  color: var(--nonu-text);
   text-align: left;
-  cursor: pointer;
-}
-.svn-log-row:hover {
-  background: var(--nonu-bg-secondary);
-}
-.svn-log-row[aria-selected="true"] {
-  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
 }
 .svn-log-row-revision {
   font: 600 var(--nonu-text-sm) var(--nonu-font-mono, monospace);
@@ -199,9 +188,9 @@
   width: 100%;
   border: 0;
   grid-template-columns: 20px minmax(0, 1fr) auto;
-  gap: 7px;
+  gap: 8px;
   align-items: center;
-  padding: 6px 8px;
+  padding: 5px 10px;
   background: transparent;
   color: var(--nonu-text);
   text-align: left;
@@ -211,9 +200,12 @@
 .svn-log-file + .svn-log-file {
   border-top: 1px solid var(--nonu-border);
 }
-.svn-log-file:hover,
-.svn-log-file--active {
+.svn-log-file:hover {
   background: var(--nonu-bg-secondary);
+}
+.svn-log-file--active {
+  background: color-mix(in srgb, var(--nonu-primary) 12%, transparent);
+  box-shadow: inset 3px 0 var(--nonu-primary);
 }
 .svn-log-file > span:nth-child(2) {
   overflow: hidden;
