@@ -15,7 +15,7 @@
 }
 .svn-rev-headline .svn-rev-number {
   flex: 0 0 auto;
-  color: #fff;
+  color: var(--nonu-text);
 }
 .svn-rev-headline .svn-rev-meta {
   min-width: 0;
