@@ -149,7 +149,7 @@
   border-radius: 2px;
 }
 .svn-diff-add .svn-sign {
-  color: var(--nonu-success, #4ade80);
+  color: var(--svn-add-sign, var(--nonu-success, #4ade80));
 }
 .svn-diff-del .svn-sign {
   color: var(--nonu-error, #f87171);
@@ -177,32 +177,59 @@
 .hljs-selector-tag,
 .hljs-literal,
 .hljs-built_in {
-  color: #c678dd;
+  color: var(--svn-hl-keyword, #c678dd);
 }
 .hljs-string,
 .hljs-regexp,
 .hljs-attr {
-  color: #98c379;
+  color: var(--svn-hl-string, #98c379);
 }
 .hljs-number,
 .hljs-symbol,
 .hljs-attribute {
-  color: #d19a66;
+  color: var(--svn-hl-number, #d19a66);
 }
 .hljs-title,
 .hljs-name,
 .hljs-selector-class,
 .hljs-selector-id {
-  color: #61afef;
+  color: var(--svn-hl-title, #61afef);
 }
 .hljs-variable,
 .hljs-property,
 .hljs-params {
-  color: #e06c75;
+  color: var(--svn-hl-variable, #e06c75);
 }
 .hljs-type,
 .hljs-tag {
-  color: #e5c07b;
+  color: var(--svn-hl-type, #e5c07b);
+}
+
+/* One Dark token colors wash out on light backgrounds */
+[data-theme="light"],
+[data-theme="solarized-warm"],
+[data-theme="milk-coffee"],
+[data-theme="dune"],
+[data-theme="turtle-svn"],
+[data-theme="matcha"] {
+  --svn-add-sign: #0b7a52;
+  --svn-hl-keyword: #8a2be2;
+  --svn-hl-string: #3d7a2a;
+  --svn-hl-number: #9a5b00;
+  --svn-hl-title: #2a64b8;
+  --svn-hl-variable: #b3263d;
+  --svn-hl-type: #8f6400;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --svn-add-sign: #0b7a52;
+    --svn-hl-keyword: #8a2be2;
+    --svn-hl-string: #3d7a2a;
+    --svn-hl-number: #9a5b00;
+    --svn-hl-title: #2a64b8;
+    --svn-hl-variable: #b3263d;
+    --svn-hl-type: #8f6400;
+  }
 }
 
 /* Diff mode toggle + split view */
