@@ -9,7 +9,7 @@ export function buildNavViews(o: {
   return [
     {
       id: 'changes',
-      icon: 'difference',
+      icon: 'edit_document',
       label: t('navLocalChanges') as string,
       group: 'workspace',
       badge: o.changesCount,
@@ -18,7 +18,7 @@ export function buildNavViews(o: {
     },
     {
       id: 'logs',
-      icon: 'timeline',
+      icon: 'view_timeline',
       label: t('navChangelogs') as string,
       group: 'workspace',
       disabled: !o.hasWorkspace,
