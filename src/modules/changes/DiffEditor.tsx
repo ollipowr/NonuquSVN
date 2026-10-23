@@ -87,6 +87,8 @@ function hljsRanges(html: string): { from: number; to: number; cls: string }[] {
   return out;
 }
 
+const lineRangesCache = new Map<string, ReturnType<typeof hljsRanges>>();
+
 function highlightPlugin(lang: string | null): Extension {
   if (!lang) return [];
   return ViewPlugin.fromClass(
@@ -106,9 +108,15 @@ function highlightPlugin(lang: string | null): Extension {
           while (pos <= to) {
             const line = view.state.doc.lineAt(pos);
             if (line.length > 0 && line.length < 2000) {
-              const ranges = hljsRanges(highlightLine(line.text, lang)).sort(
-                (x, y) => x.from - y.from || y.to - x.to,
-              );
+              const key = `${lang}\u0000${line.text}`;
+              let ranges = lineRangesCache.get(key);
+              if (!ranges) {
+                if (lineRangesCache.size > 5000) lineRangesCache.clear();
+                ranges = hljsRanges(highlightLine(line.text, lang)).sort(
+                  (x, y) => x.from - y.from || y.to - x.to,
+                );
+                lineRangesCache.set(key, ranges);
+              }
               for (const r of ranges)
                 b.add(
                   line.from + r.from,

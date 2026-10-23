@@ -160,6 +160,9 @@ const editableWorkCache = new Map<
 >();
 // Vite HMR can leave an older Electron main process running that rejects new IPC channels: fall back to PowerShell.
 let directFileApiAvailable: boolean | null = null;
+// Only a missing handler disables the direct API; svn or file errors must not slow every later read.
+const isMissingIpcHandler = (err: unknown) =>
+  err instanceof Error && err.message.includes('No handler registered');
 
 const editableFileCacheKey = (path: string, cwd: string) =>
   `${cwd}\u0000${path}`;
@@ -262,7 +265,8 @@ export async function readFileDecoded(
       const result = await _host.readFileBase64(absolute);
       directFileApiAvailable = true;
       return decodeBase64Bytes(result);
-    } catch {
+    } catch (err) {
+      if (!isMissingIpcHandler(err)) throw err;
       directFileApiAvailable = false;
     }
   }
@@ -283,7 +287,8 @@ export async function svnCatDecoded(
       const result = await _host.svnCatBase64(path, cwd);
       directFileApiAvailable = true;
       return decodeBase64Bytes(result);
-    } catch {
+    } catch (err) {
+      if (!isMissingIpcHandler(err)) throw err;
       directFileApiAvailable = false;
     }
   }
