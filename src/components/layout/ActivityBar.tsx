@@ -109,9 +109,7 @@ export function ActivityBar<Id extends string>({
               role="tab"
               aria-selected={isActive}
               aria-label={v.label}
-              title={
-                v.disabled && v.disabledTitle ? v.disabledTitle : v.label
-              }
+              title={v.disabled && v.disabledTitle ? v.disabledTitle : v.label}
               disabled={v.disabled}
               className={`svn-ab-item${isActive ? ' svn-ab-item--active' : ''}`}
               onKeyDown={(event) => {
