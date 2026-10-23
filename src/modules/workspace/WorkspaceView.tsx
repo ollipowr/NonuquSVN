@@ -1523,7 +1523,11 @@ export function WorkspaceView({
                 listRef: listRef,
                 onKeyDown: onListKeyDown,
                 onToggleFolder: toggleFolder,
-                onRowClick: onRowClick,
+                onRowClick: (event, path) => {
+                  onRowClick(event, path);
+                  if (!event.shiftKey && !event.ctrlKey && !event.metaKey)
+                    onRowDoubleClick(path);
+                },
                 onRowDoubleClick: onRowDoubleClick,
                 onContextMenu: onContextMenu,
                 onFolderContextMenu: onFolderContextMenu,
