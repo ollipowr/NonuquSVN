@@ -1,55 +1,112 @@
+.reflog-view {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .reflog {
+  flex: 1;
   display: grid;
-  grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
-  height: 100%;
+  grid-template-columns:
+    minmax(220px, var(--reflog-list-width)) 6px
+    minmax(0, 1fr);
   min-height: 0;
 }
 
-.reflog-list,
-.reflog-files {
+.reflog-list {
+  min-width: 0;
   overflow: auto;
-  border-right: 1px solid var(--nonu-border);
+}
+
+.reflog-row,
+.reflog-file {
+  --svn-list-row-padding: 8px 12px;
+}
+
+.reflog-file {
+  --svn-list-row-padding: 5px 12px;
 }
 
 .reflog-command {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
+.reflog-when {
+  font-size: var(--nonu-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
 .reflog-muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--nonu-text-muted);
-  font-size: 12px;
+  font: var(--nonu-text-xs) var(--nonu-font-mono, monospace);
+}
+
+.reflog-count {
+  min-width: 16px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--nonu-bg-tertiary);
+  color: var(--nonu-text-faint);
+  font-size: var(--nonu-text-xs);
+  text-align: center;
 }
 
 .reflog-detail {
-  display: grid;
-  grid-template-rows: auto minmax(120px, 35%) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
 }
 
 .reflog-detail-head {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--nonu-border);
+  background: var(--nonu-bg-secondary);
+}
+
+.reflog-files {
+  flex: 0 0 auto;
+  overflow: auto;
 }
 
 .reflog-path {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  direction: rtl;
+  text-align: left;
+  font: var(--nonu-text-sm) var(--nonu-font-mono, monospace);
 }
 
 .reflog-diff {
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .reflog-empty {
-  padding: 24px;
+  padding: 20px;
   color: var(--nonu-text-muted);
+  text-align: center;
+}
+
+.reflog-diff .svn-diff-body {
+  flex: 1;
+  min-height: 0;
 }
