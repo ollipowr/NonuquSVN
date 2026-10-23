@@ -115,8 +115,6 @@ const translations = {
     overwriteFile: 'Trotzdem überschreiben',
     collapseDiff: 'Diff einklappen',
     newFile: 'neue Datei',
-    splitUnavailable:
-      'Nebeneinander-Ansicht für neue Dateien nicht verfügbar. Zeige Inline-Ansicht.',
 
     // Commit area
     commitGenerating: '✨ KI schreibt die Commit-Nachricht…',
@@ -837,8 +835,6 @@ const translations = {
     overwriteFile: 'Overwrite anyway',
     collapseDiff: 'Collapse diff',
     newFile: 'new file',
-    splitUnavailable:
-      'Split view is unavailable for unversioned files. Showing inline view.',
 
     // Commit area
     commitGenerating: '✨ AI is writing the commit message…',

@@ -140,6 +140,10 @@
   background: color-mix(in srgb, var(--nonu-success, #4ade80) 38%, transparent);
   border-radius: 2px;
 }
+.svn-diff-word-add,
+.svn-diff-word-add * {
+  color: var(--nonu-text);
+}
 .svn-diff-word-del {
   background: color-mix(in srgb, var(--nonu-error, #f87171) 38%, transparent);
   border-radius: 2px;

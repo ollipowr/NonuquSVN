@@ -107,12 +107,14 @@ export function DiffControls({
   onJump,
   syncScroll = true,
   onSyncScrollChange,
+  splitDisabled = false,
 }: {
   mode: 'inline' | 'split';
   onModeChange: (mode: 'inline' | 'split') => void;
   onJump: (direction: 'prev' | 'next') => void;
   syncScroll?: boolean;
   onSyncScrollChange?: (enabled: boolean) => void;
+  splitDisabled?: boolean;
 }) {
   return (
     <>
@@ -169,6 +171,7 @@ export function DiffControls({
           variant="mode"
           active={mode === 'split'}
           aria-pressed={mode === 'split'}
+          disabled={splitDisabled}
           title={t('splitDiff') as string}
           aria-label={t('splitDiff') as string}
           onClick={() => onModeChange('split')}

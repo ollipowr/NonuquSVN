@@ -80,6 +80,7 @@ export function WorkingCopyDiffPane({
           onJump={jumpToChange}
           syncScroll={syncScroll}
           onSyncScrollChange={setSyncScroll}
+          splitDisabled={diffIsNewFile}
         />
         {activeChange?.status === 'conflicted' && (
           <Button
@@ -174,11 +175,6 @@ export function WorkingCopyDiffPane({
       </DiffHeader>
       {active && cwd && editable ? (
         <>
-          {diffIsNewFile && diffMode === 'split' && (
-            <div className="svn-diff-hint">
-              {t('splitUnavailable') as string}
-            </div>
-          )}
           <EditableDiff
             key={active}
             ref={editorRef}
