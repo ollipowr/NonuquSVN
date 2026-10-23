@@ -110,9 +110,7 @@ export function ActivityBar<Id extends string>({
               aria-selected={isActive}
               aria-label={v.label}
               title={
-                v.disabled && v.disabledTitle
-                  ? v.disabledTitle
-                  : [groupHeading, v.label].filter(Boolean).join(' · ')
+                v.disabled && v.disabledTitle ? v.disabledTitle : v.label
               }
               disabled={v.disabled}
               className={`svn-ab-item${isActive ? ' svn-ab-item--active' : ''}`}
