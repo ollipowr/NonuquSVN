@@ -170,7 +170,7 @@ export function DiffControls({
           aria-label={t('inlineDiff') as string}
           onClick={() => onModeChange('inline')}
         >
-          <span className="material-symbols-outlined">view_agenda</span>
+          <span className="material-symbols-outlined">view_stream</span>
         </Button>
         <Button
           variant="mode"
@@ -181,7 +181,7 @@ export function DiffControls({
           aria-label={t('splitDiff') as string}
           onClick={() => onModeChange('split')}
         >
-          <span className="material-symbols-outlined">vertical_split</span>
+          <span className="material-symbols-outlined">view_column_2</span>
         </Button>
       </div>
     </>

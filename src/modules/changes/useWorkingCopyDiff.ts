@@ -23,6 +23,14 @@ export function mergeinfoDiff(oldValue: string, newValue: string): string {
   );
 }
 
+/** SVN prints property hunks as `## -0,0 +1 ##`; the diff view only renders `@@` hunks. */
+export function propertyDiffHunks(text: string): string {
+  return text.replace(
+    /^## -(\d+(?:,\d+)?) \+(\d+(?:,\d+)?) ##\r?$/gm,
+    '@@ -$1 +$2 @@',
+  );
+}
+
 export function useWorkingCopyDiff({
   cwd,
   active,
@@ -87,10 +95,12 @@ export function useWorkingCopyDiff({
             return;
           }
         }
-        const { stdout } = await runSvn(['diff', active], cwd);
+        // Property-only folders must not pull in the diff of their whole subtree.
+        const depth = propsOnly ? ['--depth', 'empty'] : [];
+        const { stdout } = await runSvn(['diff', ...depth, active], cwd);
+        const text = propsOnly ? propertyDiffHunks(stdout) : stdout;
         store(
-          stdout.trim() ||
-            'No textual diff (binary file or no content change).',
+          text.trim() || 'No textual diff (binary file or no content change).',
           false,
         );
       } catch (err) {
