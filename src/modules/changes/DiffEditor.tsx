@@ -598,14 +598,6 @@ function DiffPane({
             run: () => (cb.current.onSave?.(), true),
             preventDefault: true,
           },
-          {
-            key: 'Mod-ArrowUp',
-            run: () => cb.current.onJump?.('prev') ?? false,
-          },
-          {
-            key: 'Mod-ArrowDown',
-            run: () => cb.current.onJump?.('next') ?? false,
-          },
           { key: 'Tab', run: insertTab },
           ...defaultKeymap,
           ...historyKeymap,

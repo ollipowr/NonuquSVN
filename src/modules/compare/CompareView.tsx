@@ -1,9 +1,19 @@
 import { t } from '@nonu/app/i18n';
 import { Button, Select, ViewHeader } from '@nonu/components';
-import { DiffView } from '@nonu/modules/changes';
+import {
+  DiffView,
+  type DiffViewHandle,
+  useChangeJumpShortcut,
+} from '@nonu/modules/changes';
 import { invalidateMergeinfo } from '@nonu/modules/workspace';
 import type { SvnCredentials } from '@nonu/svn';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import './CompareView.css';
 import {
   type BranchRegistry,
@@ -31,6 +41,12 @@ interface Side {
 }
 
 export function CompareView({ registry, cwd, run, onMerge }: CompareViewProps) {
+  const diffRef = useRef<DiffViewHandle>(null);
+  const jumpDiff = useCallback(
+    (dir: 'prev' | 'next') => diffRef.current?.jump(dir) ?? false,
+    [],
+  );
+  useChangeJumpShortcut(jumpDiff);
   const [leftId, setLeftId] = useState(
     () =>
       registry.entries.find((e) => e.kind === 'trunk')?.id ??
@@ -181,7 +197,7 @@ export function CompareView({ registry, cwd, run, onMerge }: CompareViewProps) {
               {t('compareDiffLoading') as string}
             </div>
           ) : diff.text.trim() ? (
-            <DiffView text={diff.text} path={null} />
+            <DiffView ref={diffRef} text={diff.text} path={null} />
           ) : (
             <div className="svn-empty-hint">
               {t('compareDiffEmpty') as string}

@@ -433,17 +433,6 @@ export const DiffView = forwardRef<
       style={split.style}
       className={`svn-diff-body${mode === 'split' ? ' svn-diff-body--split svn-diff-resizable' : ''}`}
       tabIndex={0}
-      onKeyDown={(event) => {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowUp') {
-          event.preventDefault();
-          event.stopPropagation();
-          jump('prev');
-        }
-        if ((event.ctrlKey || event.metaKey) && event.key === 'ArrowDown') {
-          event.preventDefault();
-          jump('next');
-        }
-      }}
     >
       {mode === 'split' ? (
         <>

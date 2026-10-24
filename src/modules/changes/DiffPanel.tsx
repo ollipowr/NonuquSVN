@@ -19,6 +19,7 @@ import {
   DiffView,
   type DiffViewHandle,
 } from './DiffView.js';
+import { useChangeJumpShortcut } from './diffNavigation.js';
 import type { DiffHeaders } from './RevisionHeadline.js';
 
 export interface DiffPanelHandle {
@@ -83,6 +84,8 @@ export const DiffPanel = forwardRef<DiffPanelHandle, DiffPanelProps>(
         (editRef.current ?? readRef.current)?.jump(direction) ?? false,
       [],
     );
+
+    useChangeJumpShortcut(jump);
 
     useImperativeHandle(
       ref,

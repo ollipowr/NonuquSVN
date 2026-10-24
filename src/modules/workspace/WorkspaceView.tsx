@@ -1247,31 +1247,6 @@ export function WorkspaceView({
     cwd,
   ]);
 
-  // Scrolls the diff so the previous/next change block sits in the vertical middle of the view.
-  const jumpToChange = useCallback((dir: 'prev' | 'next') => {
-    return diffRef.current?.jump(dir) ?? false;
-  }, []);
-
-  // Ctrl+Up / Ctrl+Down jumps between change blocks in the diff.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || !e.ctrlKey || e.altKey || e.shiftKey) return;
-      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
-      const t = e.target as HTMLElement | null;
-      if (
-        t &&
-        (t.tagName === 'INPUT' ||
-          t.tagName === 'TEXTAREA' ||
-          t.isContentEditable)
-      )
-        return;
-      if (jumpToChange(e.key === 'ArrowDown' ? 'next' : 'prev'))
-        e.preventDefault();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [jumpToChange]);
-
   const chooseDiffMode = (mode: DiffMode) => {
     setDiffMode(mode);
     void host.storage.set(DIFF_MODE_KEY, mode);
