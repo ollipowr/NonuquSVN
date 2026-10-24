@@ -209,8 +209,13 @@ export function LogView({
     setPath(itemPath);
     setDiff(null);
     setDiffHeaders(undefined);
-    setDiffLoading(true);
     setDiffError('');
+    // svn cat rejects folders; a folder has no file content to diff.
+    if (itemPath.kind === 'dir') {
+      setDiff({ base: '', work: '' });
+      return;
+    }
+    setDiffLoading(true);
     try {
       const result = await loadRevisionFiles(
         active.revision,
@@ -276,14 +281,22 @@ export function LogView({
               onLogFile(itemPath.path, active!.revision, itemPath.action),
             ),
         },
-        {
-          label: t('ctxBlame') as string,
-          icon: 'person_search',
-          onClick: () =>
-            void runAction(() =>
-              onBlameFile(itemPath.path, active!.revision, itemPath.action),
-            ),
-        },
+        ...(itemPath.kind === 'dir'
+          ? []
+          : [
+              {
+                label: t('ctxBlame') as string,
+                icon: 'person_search',
+                onClick: () =>
+                  void runAction(() =>
+                    onBlameFile(
+                      itemPath.path,
+                      active!.revision,
+                      itemPath.action,
+                    ),
+                  ),
+              },
+            ]),
         { separator: true },
         {
           label: t('ctxCopyRelPath') as string,

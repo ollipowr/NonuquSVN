@@ -627,6 +627,7 @@ export interface SvnLogEntry {
 export interface SvnLogPath {
   action: string;
   path: string;
+  kind?: string;
   copyFromPath?: string;
   copyFromRev?: string;
 }
@@ -646,6 +647,7 @@ export function parseSvnLog(xml: string): SvnLogEntry[] {
       paths.push({
         action: /action="([^"]*)"/.exec(attrs)?.[1] ?? 'M',
         path: xmlUnescape(pathMatch[2].trim()),
+        kind: /\bkind="([^"]*)"/.exec(attrs)?.[1],
         copyFromPath: /copyfrom-path="([^"]*)"/.exec(attrs)?.[1],
         copyFromRev: /copyfrom-rev="([^"]*)"/.exec(attrs)?.[1],
       });
