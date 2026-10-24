@@ -4,6 +4,7 @@ import type { WorkspaceViewId } from './WorkspaceView.js';
 export function buildNavViews(o: {
   hasWorkspace: boolean;
   changesCount: number;
+  showRepoBrowser: boolean;
 }): ActivityView<WorkspaceViewId>[] {
   const disabledTitle = t('navNeedWorkspace') as string;
   return [
@@ -32,13 +33,17 @@ export function buildNavViews(o: {
       disabled: !o.hasWorkspace,
       disabledTitle,
     },
-    {
-      id: 'repo',
-      icon: 'folder_open',
-      label: t('navRepoBrowser') as string,
-      group: 'workspace',
-      disabled: !o.hasWorkspace,
-      disabledTitle,
-    },
+    ...(o.showRepoBrowser
+      ? [
+          {
+            id: 'repo' as const,
+            icon: 'folder_open',
+            label: t('navRepoBrowser') as string,
+            group: 'workspace' as const,
+            disabled: !o.hasWorkspace,
+            disabledTitle,
+          },
+        ]
+      : []),
   ];
 }

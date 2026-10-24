@@ -299,6 +299,7 @@ function HomeShell({
         views={buildNavViews({
           hasWorkspace,
           changesCount,
+          showRepoBrowser: import.meta.env.DEV,
         })}
         active={activeView}
         noneActive={noneActive}

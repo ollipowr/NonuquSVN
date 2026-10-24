@@ -1420,6 +1420,7 @@ export function WorkspaceView({
         views={buildNavViews({
           hasWorkspace: true,
           changesCount: changes.length,
+          showRepoBrowser: import.meta.env.DEV,
         })}
       />
       <div
