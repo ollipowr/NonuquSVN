@@ -8,6 +8,9 @@ import type {
   SnapshotEntryInput,
   SnapshotFileInput,
   SnapshotRecord,
+  StorageCleanupId,
+  StorageCleanupItem,
+  StorageCleanupResult,
 } from '../src/host/types.js';
 
 declare global {
@@ -39,10 +42,13 @@ declare global {
       setTitleBarTheme(color: string, symbolColor: string): Promise<void>;
       appIconUrl(): string;
       devClearStorage(): Promise<void>;
+      resetAllData(): Promise<void>;
       snapshotSave(entry: SnapshotEntryInput, files: SnapshotFileInput[]): Promise<SnapshotRecord>;
       snapshotList(workspace: string): Promise<SnapshotRecord[]>;
       snapshotRestore(id: string, files: string[], mode: RestoreMode): Promise<RestoreResult>;
       snapshotReadFile(id: string, path: string): Promise<string | null>;
+      storageCleanupList(): Promise<StorageCleanupItem[]>;
+      storageCleanupRun(ids: StorageCleanupId[]): Promise<StorageCleanupResult[]>;
     };
   }
 }
@@ -81,6 +87,13 @@ export function createElectronAdapter(): HostAdapter {
       : undefined,
 
     storage,
+
+    storageCleanupItems: () => window.svnHost.storageCleanupList(),
+    runStorageCleanup: (ids) => window.svnHost.storageCleanupRun(ids),
+    resetAllData: async () => {
+      await window.svnHost.resetAllData();
+      await window.svnHost.appAction('reload');
+    },
 
     openFile: (path: string) => {
       return window.svnHost.openFile(path);

@@ -183,40 +183,43 @@ export function MergeView({
           ? (t('mergeTargetNeedsLocal') as string)
           : null;
 
-  /** Loads eligible revisions and their log, and checks the target guard: SVN aborts a mixed-revision working copy (E195020). */
-  const loadRevisions = useCallback(async () => {
-    if (!source || !target?.localPath) return;
-    setLoading(true);
-    setStep('revisions');
-    setError(null);
-    setGuard(null);
-    try {
-      const targetStatus = await fetchBranchStatus(
-        target,
-        cwd,
-        undefined,
-        true,
-      );
-      if ((targetStatus?.localChanges ?? 0) > 0) {
-        setGuard({ dirty: targetStatus!.localChanges });
-        setEligible(null);
-        return;
+  /** Loads eligible revisions and their log; local target changes warn unless accepted. Mixed revisions still fail in svn (E195020). */
+  const loadRevisions = useCallback(
+    async (acceptLocal = false) => {
+      if (!source || !target?.localPath) return;
+      setLoading(true);
+      setStep('revisions');
+      setError(null);
+      setGuard(null);
+      try {
+        const targetStatus = await fetchBranchStatus(
+          target,
+          cwd,
+          undefined,
+          true,
+        );
+        if (!acceptLocal && (targetStatus?.localChanges ?? 0) > 0) {
+          setGuard({ dirty: targetStatus!.localChanges });
+          setEligible(null);
+          return;
+        }
+        const [revs, mergedRevs] = await Promise.all([
+          fetchEligible(source.url, target.url, cwd),
+          fetchMerged(source.url, target.url, cwd),
+        ]);
+        setEligible(revs);
+        setMerged(mergedRevs);
+        setLog([]);
+        setVisibleCount(100);
+        setPicked(new Set(revs));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLoading(false);
       }
-      const [revs, mergedRevs] = await Promise.all([
-        fetchEligible(source.url, target.url, cwd),
-        fetchMerged(source.url, target.url, cwd),
-      ]);
-      setEligible(revs);
-      setMerged(mergedRevs);
-      setLog([]);
-      setVisibleCount(100);
-      setPicked(new Set(revs));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [source, target, targetWorkingCopy, updateStatuses, cwd]);
+    },
+    [source, target, targetWorkingCopy, updateStatuses, cwd],
+  );
 
   const onUpdateTarget = useCallback(() => {
     if (!target) return;
@@ -645,11 +648,17 @@ export function MergeView({
                 <div className="svn-auth-actions svn-merge-actions">
                   <span className="svn-merge-inline-status" />
                   <div className="svn-merge-action-buttons">
-                    <Button variant="primary" onClick={onUpdateTarget}>
+                    <Button onClick={onUpdateTarget}>
                       {t('mergeUpdateFirst') as string}
                     </Button>
                     <Button onClick={() => void loadRevisions()}>
                       {t('mergeRecheck') as string}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => void loadRevisions(true)}
+                    >
+                      {t('mergeProceedDirty') as string}
                     </Button>
                   </div>
                 </div>

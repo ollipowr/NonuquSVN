@@ -41,8 +41,8 @@ import {
   useWorkspaceStatusVersion,
 } from '@nonu/modules/workspace/workspaceStore';
 import { detectSvnRepo } from '@nonu/svn';
-import React, { useEffect, useState } from 'react';
-import { t } from './i18n';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import { getLocale, subscribeLocale, t } from './i18n';
 
 const THEMES = [
   { id: 'dark', name: 'Dark' },
@@ -344,6 +344,7 @@ function HomeShell({
 }
 
 export function App({ adapter }: { adapter: HostAdapter }) {
+  useSyncExternalStore(subscribeLocale, getLocale);
   const [singleProject, setSingleProject] = useState(
     () => loadSettings(adapter.storage).singleProject,
   );

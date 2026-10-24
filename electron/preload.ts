@@ -1,6 +1,13 @@
 import { contextBridge, ipcRenderer, webFrame } from 'electron';
 import type { ShellRequest } from '../src/host/shellRequest';
-import type { RestoreMode, SnapshotEntryInput, SnapshotFileInput } from '../src/host/types';
+import type {
+  RestoreMode,
+  SnapshotEntryInput,
+  SnapshotFileInput,
+  StorageCleanupId,
+  StorageCleanupItem,
+  StorageCleanupResult,
+} from '../src/host/types';
 
 /** Typed renderer API via contextBridge. Initial values are fetched synchronously so they exist before the first render. */
 
@@ -102,6 +109,10 @@ contextBridge.exposeInMainWorld('svnHost', {
     ipcRenderer.invoke('set-titlebar-theme', color, symbolColor),
   appIconUrl: () => appIconUrl,
   devClearStorage: () => ipcRenderer.invoke('dev-clear-storage'),
+  resetAllData: (): Promise<void> => ipcRenderer.invoke('reset-all-data'),
+  storageCleanupList: (): Promise<StorageCleanupItem[]> => ipcRenderer.invoke('storage-cleanup-list'),
+  storageCleanupRun: (ids: StorageCleanupId[]): Promise<StorageCleanupResult[]> =>
+    ipcRenderer.invoke('storage-cleanup-run', ids),
 });
 
 // When a second instance passes a new path, update currentWorkspacePath and

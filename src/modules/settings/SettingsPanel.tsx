@@ -1,10 +1,21 @@
-import { Button, Select, Spinner, Switch } from '@nonu/components';
+import {
+  Button,
+  ConfirmDialog,
+  Select,
+  Spinner,
+  Switch,
+} from '@nonu/components';
 import { TextArea, TextInput } from '@nonu/components/ui/TextInput';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import './SettingsPanel.css';
 import { type Locale, setLocale, t } from '@nonu/app/i18n';
 import { ViewHeader } from '@nonu/components';
-import type { HostAdapter } from '@nonu/host/types';
+import { useConfirmation } from '@nonu/hooks';
+import type {
+  HostAdapter,
+  StorageCleanupId,
+  StorageCleanupItem,
+} from '@nonu/host/types';
 import { listAiModels } from '@nonu/stores';
 import { scanFormatterRules } from '@nonu/utils';
 import {
@@ -294,6 +305,8 @@ export function SvnSettingsPanel({
                       />
                     </Row>
                   </Card>
+                  <StorageCleanupCard host={host} />
+                  <ResetCard host={host} />
                   <Card title={t('settingsFileListSection') as string}>
                     <Row
                       label={t('settingsDefaultSelection') as string}
@@ -642,5 +655,169 @@ function Check({
         <Switch checked={value} onChange={onChange} />
       </label>
     </Match>
+  );
+}
+
+const STORAGE_TEXT: Record<
+  StorageCleanupId,
+  { label: Parameters<typeof t>[0]; hint: Parameters<typeof t>[0] }
+> = {
+  'http-cache': { label: 'cleanupHttpLabel', hint: 'cleanupHttpHint' },
+  'code-cache': { label: 'cleanupCodeLabel', hint: 'cleanupCodeHint' },
+  reflog: { label: 'cleanupReflogLabel', hint: 'cleanupReflogHint' },
+};
+const STORAGE_DEFAULT: StorageCleanupId[] = ['http-cache', 'code-cache'];
+
+function formatSize(bytes: number) {
+  return bytes >= 1024 * 1024
+    ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function StorageCleanupCard({ host }: { host: HostAdapter }) {
+  const { storageCleanupItems, runStorageCleanup } = host;
+  const [items, setItems] = useState<StorageCleanupItem[]>([]);
+  const [selected, setSelected] = useState(() => new Set(STORAGE_DEFAULT));
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const { confirmation, show, cancel } = useConfirmation();
+
+  const reload = () =>
+    storageCleanupItems?.()
+      .then((list) => setItems(list.filter((i) => i.bytes > 0)))
+      .catch(() => setItems([]));
+
+  useEffect(() => {
+    void reload();
+  }, []);
+
+  if (!storageCleanupItems || !runStorageCleanup) return null;
+
+  const toggle = (id: StorageCleanupId, on: boolean) => {
+    const next = new Set(selected);
+    if (on) next.add(id);
+    else next.delete(id);
+    setSelected(next);
+  };
+
+  const picked = items.filter((i) => selected.has(i.id));
+  const pickedBytes = picked.reduce((sum, i) => sum + i.bytes, 0);
+
+  const run = async (ids: StorageCleanupId[]) => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const results = await runStorageCleanup(ids);
+      const failed = results.filter((r) => r.error);
+      const freed = picked
+        .filter((i) => !failed.some((f) => f.id === i.id))
+        .reduce((sum, i) => sum + i.bytes, 0);
+      setMsg(
+        failed.length
+          ? (t('settingsStorageFailed') as (n: string) => string)(
+              failed
+                .map((f) => t(STORAGE_TEXT[f.id].label) as string)
+                .join(', '),
+            )
+          : (t('settingsStorageDone') as (n: string) => string)(
+              formatSize(freed),
+            ),
+      );
+    } finally {
+      setBusy(false);
+      void reload();
+    }
+  };
+
+  const askClean = () => {
+    const lost = picked
+      .map(
+        (i) => `${t(STORAGE_TEXT[i.id].label)}: ${t(STORAGE_TEXT[i.id].hint)}`,
+      )
+      .join(' · ');
+    show({
+      title: t('settingsStorageConfirmTitle') as string,
+      message: (
+        t('settingsStorageConfirmMsg') as (s: string, i: string) => string
+      )(formatSize(pickedBytes), lost),
+      confirmLabel: t('settingsStorageClean') as string,
+      danger: true,
+      onConfirm: () => void run(picked.map((i) => i.id)),
+    });
+  };
+
+  return (
+    <Card title={t('settingsCardStorage') as string}>
+      <p className="svn-settings-hint">{t('settingsStorageHint') as string}</p>
+      {items.map((i) => (
+        <Row
+          key={i.id}
+          label={`${t(STORAGE_TEXT[i.id].label)} · ${formatSize(i.bytes)}`}
+          hint={t(STORAGE_TEXT[i.id].hint) as string}
+        >
+          <Switch
+            checked={selected.has(i.id)}
+            onChange={(on) => toggle(i.id, on)}
+          />
+        </Row>
+      ))}
+      <div className="svn-settings-row">
+        <Button
+          variant="danger"
+          disabled={busy || picked.length === 0}
+          onClick={askClean}
+        >
+          {`${t('settingsStorageClean') as string} (${formatSize(pickedBytes)})`}
+        </Button>
+        {msg && <span className="svn-settings-hint">{msg}</span>}
+      </div>
+      {confirmation && (
+        <ConfirmDialog
+          title={confirmation.title}
+          message={confirmation.message}
+          confirmLabel={confirmation.confirmLabel}
+          danger={confirmation.danger}
+          onConfirm={confirmation.onConfirm}
+          onCancel={cancel}
+        />
+      )}
+    </Card>
+  );
+}
+
+function ResetCard({ host }: { host: HostAdapter }) {
+  const { resetAllData } = host;
+  const { confirmation, show, cancel } = useConfirmation();
+
+  if (!resetAllData) return null;
+
+  return (
+    <Card title={t('settingsCardReset') as string}>
+      <p className="svn-settings-hint">{t('settingsResetHint') as string}</p>
+      <Button
+        variant="danger"
+        onClick={() =>
+          show({
+            title: t('settingsResetConfirmTitle') as string,
+            message: t('settingsResetConfirmMsg') as string,
+            confirmLabel: t('settingsResetButton') as string,
+            danger: true,
+            onConfirm: () => void resetAllData(),
+          })
+        }
+      >
+        {t('settingsResetButton') as string}
+      </Button>
+      {confirmation && (
+        <ConfirmDialog
+          title={confirmation.title}
+          message={confirmation.message}
+          confirmLabel={confirmation.confirmLabel}
+          danger={confirmation.danger}
+          onConfirm={confirmation.onConfirm}
+          onCancel={cancel}
+        />
+      )}
+    </Card>
   );
 }

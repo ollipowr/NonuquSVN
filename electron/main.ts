@@ -1,10 +1,15 @@
-import { app, BrowserWindow, Menu, ipcMain, dialog, shell, safeStorage } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, dialog, shell, safeStorage, session } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import { exec, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { parseShellRequest } from '../src/host/shellRequest';
-import type { RestoreMode, SnapshotEntryInput, SnapshotFileInput } from '../src/host/types';
+import type {
+  RestoreMode,
+  SnapshotEntryInput,
+  SnapshotFileInput,
+  StorageCleanupId,
+} from '../src/host/types';
 import {
   listSnapshots,
   pruneAllSnapshots,
@@ -14,6 +19,7 @@ import {
   type SnapshotLimits,
   saveSnapshot,
 } from './snapshotStore';
+import { measureStorageCleanup, runStorageCleanup, wipeUserData } from './storageCleanup';
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -438,6 +444,11 @@ ipcMain.handle('load-credential', (_e, account: string) => {
   }
 });
 
+ipcMain.handle('storage-cleanup-list', () => measureStorageCleanup(app.getPath('userData')));
+ipcMain.handle('storage-cleanup-run', (_e, ids: StorageCleanupId[]) =>
+  runStorageCleanup(app.getPath('userData'), ids, session.defaultSession),
+);
+
 ipcMain.handle('dev-clear-storage', () => {
   storageData = {};
   try {
@@ -448,4 +459,9 @@ ipcMain.handle('dev-clear-storage', () => {
     console.error('[dev-clear-storage] failed to delete file', e);
   }
   return true;
+});
+
+ipcMain.handle('reset-all-data', async () => {
+  storageData = {};
+  await wipeUserData(app.getPath('userData'), session.defaultSession);
 });

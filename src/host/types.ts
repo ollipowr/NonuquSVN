@@ -67,6 +67,18 @@ export interface AiProvider {
 }
 
 /** The host APIs the SVN panel uses. The Electron adapter implements this. */
+export type StorageCleanupId = 'http-cache' | 'code-cache' | 'reflog';
+
+export interface StorageCleanupItem {
+  id: StorageCleanupId;
+  bytes: number;
+}
+
+export interface StorageCleanupResult {
+  id: StorageCleanupId;
+  error?: string;
+}
+
 export interface HostAdapter {
   /** Absolute path of the current workspace / working directory. */
   workspacePath: string;
@@ -124,6 +136,14 @@ export interface HostAdapter {
 
   /** Base64 content of one file stored in a snapshot; null when it was not stored. */
   readSnapshotFile?(id: string, path: string): Promise<string | null>;
+
+  /** Sizes of the app data that can be cleared from settings. */
+  storageCleanupItems?(): Promise<StorageCleanupItem[]>;
+
+  runStorageCleanup?(ids: StorageCleanupId[]): Promise<StorageCleanupResult[]>;
+
+  /** Deletes all saved app state and restarts the app. */
+  resetAllData?(): Promise<void>;
 
   ai: AiProvider | null;
 }

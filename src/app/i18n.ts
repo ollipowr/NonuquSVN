@@ -1,9 +1,16 @@
 export type Locale = 'de' | 'en';
 
 let _locale: Locale = 'de';
+const localeListeners = new Set<() => void>();
 
 export function setLocale(locale: Locale) {
   _locale = locale;
+  localeListeners.forEach((listener) => listener());
+}
+
+export function subscribeLocale(listener: () => void) {
+  localeListeners.add(listener);
+  return () => localeListeners.delete(listener);
 }
 
 export function getLocale(): Locale {
@@ -300,6 +307,32 @@ const translations = {
     settingsReflogDays: 'Aufbewahrung (Tage)',
     settingsReflogMB: 'Maximale Größe (MB)',
     settingsReflogHint: 'Ältere Einträge werden automatisch entfernt.',
+    settingsCardReset: 'Zurücksetzen',
+    settingsResetHint:
+      'Löscht alles in der App: Einstellungen, Projekte, Branches, Undo-Verlauf und Caches. Dateien in Arbeitskopien bleiben unberührt. Die App startet danach wie neu.',
+    settingsResetButton: 'Werkeinstellungen wiederherstellen',
+    settingsResetConfirmTitle: 'Alles zurücksetzen?',
+    settingsResetConfirmMsg:
+      'Einstellungen, Projekte, Branches, Undo-Verlauf und Caches werden unwiderruflich gelöscht. Die App startet neu.',
+    settingsCardStorage: 'Speicher bereinigen',
+    settingsStorageHint:
+      'Zwischenspeicher und Verlauf im App-Datenordner. Einstellungen und Arbeitskopien bleiben erhalten.',
+    settingsStorageClean: 'Ausgewählte löschen',
+    settingsStorageConfirmTitle: 'Speicher bereinigen?',
+    settingsStorageConfirmMsg: (size: string, items: string) =>
+      `${size} werden freigegeben. Verloren geht: ${items}`,
+    settingsStorageDone: (size: string) => `${size} freigegeben.`,
+    settingsStorageFailed: (names: string) =>
+      `Nicht entfernt (evtl. in Benutzung, nach Neustart erneut versuchen): ${names}`,
+    cleanupHttpLabel: 'HTTP-Cache',
+    cleanupHttpHint:
+      'Zwischengespeicherte Web-Ressourcen. Verlust: werden beim nächsten Laden neu geholt.',
+    cleanupCodeLabel: 'Code-Cache',
+    cleanupCodeHint:
+      'Vorkompilierter JavaScript-Code. Verlust: der nächste Start ist etwas langsamer.',
+    cleanupReflogLabel: 'Rückgängig-Verlauf (Reflog)',
+    cleanupReflogHint:
+      'Snapshots früherer Änderungen für Rückgängig und Dateiversionen. Verlust: ältere Änderungen lassen sich nicht mehr zurücksetzen.',
     snapshotLimitTitle: 'Snapshot zu groß',
     snapshotLimitMsg: (mb: number) =>
       `Der Snapshot ist ca. ${mb} MB groß und überschreitet 200 MB. Trotzdem fortfahren ohne Sicherung?`,
@@ -620,8 +653,9 @@ const translations = {
     mergeGapWarning:
       'Die Auswahl ist nicht lückenlos. Die Lücke bleibt im Merge-Tracking offen — der Merge ist trotzdem erlaubt.',
     mergeTargetDirty: (n: number) =>
-      `Das Ziel hat ${n} lokale Änderung(en). Merge nur in ein sauberes Ziel.`,
+      `Das Ziel hat ${n} lokale Änderung(en). Der Merge kann trotzdem laufen; Konflikte mit diesen Änderungen musst du danach lösen.`,
     mergeUpdateFirst: 'Zuerst Update ausführen',
+    mergeProceedDirty: 'Trotzdem fortfahren',
     mergeUpdateBothHint:
       'Vor dem Merge werden Quelle und Ziel auf den neuesten Stand gebracht.',
     mergeUpdateSource: (name: string) => `Update für Quelle „${name}“`,
@@ -1049,6 +1083,32 @@ const translations = {
     settingsReflogDays: 'Retention (days)',
     settingsReflogMB: 'Maximum size (MB)',
     settingsReflogHint: 'Older entries are removed automatically.',
+    settingsCardReset: 'Reset',
+    settingsResetHint:
+      'Deletes everything in the app: settings, projects, branches, undo history and caches. Files in working copies are not touched. The app starts fresh afterwards.',
+    settingsResetButton: 'Restore factory settings',
+    settingsResetConfirmTitle: 'Reset everything?',
+    settingsResetConfirmMsg:
+      'Settings, projects, branches, undo history and caches will be permanently deleted. The app restarts.',
+    settingsCardStorage: 'Clean up storage',
+    settingsStorageHint:
+      'Caches and history in the app data folder. Settings and workspaces are kept.',
+    settingsStorageClean: 'Delete selected',
+    settingsStorageConfirmTitle: 'Clean up storage?',
+    settingsStorageConfirmMsg: (size: string, items: string) =>
+      `${size} will be freed. Lost: ${items}`,
+    settingsStorageDone: (size: string) => `${size} freed.`,
+    settingsStorageFailed: (names: string) =>
+      `Not removed (possibly in use, retry after restart): ${names}`,
+    cleanupHttpLabel: 'HTTP cache',
+    cleanupHttpHint:
+      'Cached web resources. Loss: they are fetched again on next load.',
+    cleanupCodeLabel: 'Code cache',
+    cleanupCodeHint:
+      'Precompiled JavaScript. Loss: the next start is a bit slower.',
+    cleanupReflogLabel: 'Undo history (reflog)',
+    cleanupReflogHint:
+      'Snapshots of earlier changes for undo and file versions. Loss: older changes can no longer be reverted.',
     snapshotLimitTitle: 'Snapshot too large',
     snapshotLimitMsg: (mb: number) =>
       `The snapshot is about ${mb} MB and exceeds 200 MB. Continue without a backup anyway?`,
@@ -1362,8 +1422,9 @@ const translations = {
     mergeGapWarning:
       'The selection has gaps. The gap stays open in merge tracking — the merge is still allowed.',
     mergeTargetDirty: (n: number) =>
-      `The target has ${n} local change(s). Merge only into a clean target.`,
+      `The target has ${n} local change(s). The merge can still run; resolve any conflicts with these changes afterwards.`,
     mergeUpdateFirst: 'Update first',
+    mergeProceedDirty: 'Proceed anyway',
     mergeUpdateBothHint:
       'The source and target are brought up to date before merging.',
     mergeUpdateSource: (name: string) => `Update source “${name}”`,
